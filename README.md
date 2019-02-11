@@ -1,3 +1,5 @@
+![Travis CI](https://travis-ci.org/nimbly/Shuttle.svg?branch=master)
+
 ## Shuttle
 A simple PSR-7 HTTP library.
 
