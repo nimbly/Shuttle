@@ -1,6 +1,7 @@
 # Shuttle
 [![Latest Stable Version](https://img.shields.io/packagist/v/nimbly/Shuttle.svg?style=flat-square)](https://packagist.org/packages/nimbly/Shuttle)
 [![Build Status](https://img.shields.io/travis/nimbly/Shuttle.svg?style=flat-square)](https://travis-ci.org/nimbly/Shuttle)
+[![Code Coverage](https://img.shields.io/coveralls/github/nimbly/Shuttle.svg?style=flat-square)](https://coveralls.io/repos/github/nimbly/Shuttle)
 [![License](https://img.shields.io/github/license/nimbly/Shuttle.svg?style=flat-square)](https://packagist.org/packages/nimbly/Shuttle)
 
 
