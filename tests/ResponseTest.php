@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace Shuttle\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Shuttle\Response;
