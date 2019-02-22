@@ -1,6 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Shuttle;
+
+define("SHUTTLE_USER_AGENT", "Shuttle/1.0");
 
 use Closure;
 use Psr\Http\Client\ClientInterface;
@@ -13,27 +15,69 @@ use Shuttle\Handler\HandlerAbstract;
 
 class Shuttle implements ClientInterface
 {
-    const SHUTTLE_USER_AGENT = "Shuttle/1.0";
-
     /**
      * Shuttle specific options.
      *
      * @var array
      */
     private $options = [
+
+        /**
+         * Handler to use for calls.
+         * 
+         * Defaults to CurlHandler.
+         */
         "handler" => null,
+
+        /**
+         * HTTP protocol version to use for calls.
+         * 
+         * Defaults to "1.1".
+         */
         "http_version" => "1.1",
+
+        /**
+         * Base URL to prepend to request calls. This base URL is only prepended
+         * when using the "request" method (or any of the built-in HTTP method
+         * calls: get, post, put, etc.).
+         * 
+         * Defaults to null.
+         */
         "base_url" => null,
+
+        /**
+         * Set of key => value pairs to include as default headers with
+         * request calls. Headers are only added when using the "request"
+         * method (or any of the built-in HTTP method calls: get, post, put, etc.).
+         * 
+         * Defaults to empty array.
+         */
         "headers" => [],
+
+        /**
+         * Middleware instances to run in the middleware pipeline. Each element
+         * should be an instance of Shuttle\MiddlewareInterface. Middleware
+         * are executed in the order provided in the array.
+         * 
+         * Defaults to empty array.
+         */
         "middleware" => [],
+
+        /**
+         * Enable or disable debug mode.
+         * Debug mode will print verbose connection, request, and response data to STDOUT.
+         * 
+         * Defaults to false.
+         */
+        "debug" => false,
     ];
 
     /**
-     * Compiled Middleware pipeline.
+     * Compiled Middleware pipeline
      *
      * @var \Closure
      */
-    private $middlewareStack;
+    private $middlewarePipeline;
 
     /**
      * Shuttle constructor.
@@ -42,21 +86,50 @@ class Shuttle implements ClientInterface
      */
     public function __construct(array $options = [])
     {
+        // Merge in user supplied options.
         $this->options = array_merge($this->options, $options);
 
         // Create default HTTP handler (CurlHandler) if none was provided.
         $this->options['handler'] = $this->options["handler"] ?? new CurlHandler;
 
-        // Make sure Handler is really a Handler.
+        // Make sure handler is really a Handler.
         if( ($this->options['handler'] instanceof HandlerAbstract) === false ){
             throw new \Exception("Handler option must be an instance of HandlerAbstract.");
         }
 
-        // Compile the Middleware stack.
-        $this->middlewareStack = $this->compileMiddleware(
+        // Enable debug mode on handler.
+        if( $this->options['debug'] ){
+            $this->getHandler()->setDebug($this->options['debug'] === true);
+        }
+
+        // Compile the Middleware pipeline.
+        $this->middlewarePipeline = $this->compileMiddleware(
             $this->options['middleware'],
             [$this->getHandler(), 'execute']
         );
+    }
+
+    /**
+     * Compile the middleware Lamda pipeline.
+     *
+     * @param array $layers
+     * @return Closure
+     */
+    private function compileMiddleware(array $layers, callable $kernel): Closure
+    {
+        // Reverse the Middleware layers as we are essentially pushing them onto a stack.
+        $layers = array_reverse($layers);
+
+        // Create a single nested Lamda with all the Middleware layers being passed on to the next.
+        return array_reduce($layers, function(Closure $next, MiddlewareInterface $middleware) {
+
+            return function($request) use ($next, $middleware){
+                return $middleware->process($request, $next);
+            };
+
+        }, function($request) use ($kernel) {
+            return $kernel($request);
+        });
     }
 
     /**
@@ -74,45 +147,12 @@ class Shuttle implements ClientInterface
      */
     public function sendRequest(RequestInterface $request): ResponseInterface
     {
-        // Set default HTTP version
-        $request = $request->withProtocolVersion($this->options['http_version']);
-
-        // Add in default headers to request.
-        if( !empty($this->options['headers']) ){
-            foreach( $this->options['headers'] as $name => $value ){
-                $request = $request->withAddedHeader($name, $value);
-            }
-        }
-
-        // Add in default User-Agent header if none was provided.
-        if( $request->hasHeader('User-Agent') === false ){
-            $request = $request->withHeader('User-Agent', self::SHUTTLE_USER_AGENT . ' PHP/' . PHP_VERSION);
-        }
-
-        return call_user_func_array($this->middlewareStack, [$request]);
-    }
-
-    /**
-     * Build the middleware Lamda stack.
-     *
-     * @param array $layers
-     * @return Closure
-     */
-    private function compileMiddleware(array $layers, callable $kernel): Closure
-    {
-        // Reverse the Middleware layers as we are essentially pushing them onto a stack.
-        $layers = array_reverse($layers);
-
-        // Create a single nested Lamda with all the Middleware.
-        return array_reduce($layers, function(Closure $next, MiddlewareInterface $middleware) {
-
-            return function($request) use ($next, $middleware){
-                return $middleware->process($request, $next);
-            };
-
-        }, function($request) use ($kernel) {
-            return $kernel($request);
-        });
+        /**
+         * 
+         * Send the request through the Middleware pipeline.
+         * 
+         */
+        return call_user_func($this->middlewarePipeline, $request);
     }
 
     /**
@@ -139,6 +179,22 @@ class Shuttle implements ClientInterface
         ->withMethod($method)
         ->withUri($url);
 
+        // Set default HTTP version
+        $request = $request->withProtocolVersion($this->options['http_version']);
+
+        // Add in default headers to request.
+        if( !empty($this->options['headers']) ){
+            foreach( $this->options['headers'] as $name => $value ){
+                $request = $request->withAddedHeader($name, $value);
+            }
+        }
+
+        // Add in default User-Agent header if none was provided.
+        if( $request->hasHeader('User-Agent') === false ){
+            $request = $request->withHeader('User-Agent', SHUTTLE_USER_AGENT . ' PHP/' . PHP_VERSION);
+        }
+
+        // Add body and Content-Type header
         if( $body ){
             $request = $request->withBody($body);
 
@@ -147,6 +203,7 @@ class Shuttle implements ClientInterface
             }
         }
 
+        // Add request specific headers.
         if( !empty($options['headers']) ){
             foreach( $options['headers'] as $key => $value ){
                 $request = $request->withHeader($key, $value);

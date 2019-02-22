@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Shuttle\Handler;
 
@@ -15,4 +15,14 @@ abstract class HandlerAbstract
      * @return Response
      */
     abstract public function execute(RequestInterface $request): Response;
+
+    /**
+     * Enable or disable debug mode for the handler.
+     * 
+     * Debug mode will print additional connection, request, and response information to STDOUT.
+     * 
+     * @param boolean $debug
+     * @return HandlerAbstract
+     */
+    abstract public function setDebug(bool $debug): HandlerAbstract;
 }

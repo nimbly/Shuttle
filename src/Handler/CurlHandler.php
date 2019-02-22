@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Shuttle\Handler;
 
@@ -73,14 +73,11 @@ class CurlHandler extends HandlerAbstract
     }
 
     /**
-     * Enable/disable cURL verbosity (debug) mode.
-     *
-     * @param boolean $verbose
-     * @return CurlHandler
+     * @inheritDoc
      */
-    public function setVerbose(bool $verbose = true): CurlHandler
+    public function setDebug(bool $debug): HandlerAbstract
     {
-        $this->options[CURLOPT_VERBOSE] = $verbose;
+        $this->options[CURLOPT_VERBOSE] = $debug;
         return $this;
     }
 
@@ -106,7 +103,7 @@ class CurlHandler extends HandlerAbstract
             CURLOPT_CUSTOMREQUEST => $request->getMethod(),
             CURLOPT_PORT => $request->getUri()->getPort(),
             CURLOPT_URL => (string) $request->getUri(),
-            CURLOPT_HTTPHEADER => $this->buildRequestHeaderValues($request),
+            CURLOPT_HTTPHEADER => $this->buildRequestHeaders($request),
             CURLOPT_WRITEFUNCTION => function($handler, $data) use (&$response): int {
 
                 return $response->getBody()->write($data);
@@ -186,12 +183,18 @@ class CurlHandler extends HandlerAbstract
     }
 
     /**
-     * Get the processed header values.
+     * Build the processed request header values as an array of header strings.
+     * 
+     * Eg:
+     * [
+     *      "Content-Type: text/plain",
+     *      "Authorization: Basic YnJlbnRAbmltYmx5LmlvOnBhc3N3b3JkCg=="
+     * ]
      *
      * @param RequestInterface $request
      * @return array
      */
-    private function buildRequestHeaderValues(RequestInterface $request): array
+    private function buildRequestHeaders(RequestInterface $request): array
     {
         $headers = [];
 

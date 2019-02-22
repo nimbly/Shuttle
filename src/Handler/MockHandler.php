@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Shuttle\Handler;
 
@@ -13,6 +13,13 @@ class MockHandler extends HandlerAbstract
      * @var Response[]
      */
     protected $responses = [];
+
+    /**
+     * Debug mode flag.
+     *
+     * @var boolean
+     */
+    protected $debug = false;
 
     /**
      * MockHandler constructor.
@@ -36,5 +43,14 @@ class MockHandler extends HandlerAbstract
         }
 
         return array_shift($this->responses);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setDebug(bool $debug): HandlerAbstract
+    {
+        $this->debug = $debug;
+        return $this;
     }
 }

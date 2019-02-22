@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Shuttle;
 
@@ -23,6 +23,14 @@ class Response extends MessageAbstract implements ResponseInterface
      */
     protected $statusPhrase;
 
+    /**
+     * Response constructor.
+     *
+     * @param string $statusCode
+     * @param StreamInterface|string $body
+     * @param array $headers
+     * @param string $httpVersion
+     */
     public function __construct($statusCode = null, $body = null, array $headers = [], $httpVersion = "1.1")
     {
         if( $statusCode ){

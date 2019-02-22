@@ -1,9 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Shuttle;
 
+
 class ResponseStatus
 {
+    /**
+     * Official HTTP status codes mapped to their response phrase.
+     *
+     * @var array
+     */
     protected static $phrases = [
         100 => "Continue",
         101 => "Switching Protocols",
@@ -79,7 +85,7 @@ class ResponseStatus
      * @param int $code
      * @return string|null
      */
-    public static function getPhrase(int $code)
+    public static function getPhrase(int $code): ?string
     {
         if( array_key_exists($code, self::$phrases) ){
             return self::$phrases[$code];
