@@ -5,6 +5,11 @@ namespace Shuttle\Tests;
 use PHPUnit\Framework\TestCase;
 use Shuttle\Body\JsonBody;
 
+/**
+ * @covers Shuttle\Body\JsonBody
+ * @covers Shuttle\Body\BufferBody
+ * @covers Shuttle\Stream\BufferStream
+ */
 class JsonBodyTest extends TestCase
 {
     public function test_default_content_type()

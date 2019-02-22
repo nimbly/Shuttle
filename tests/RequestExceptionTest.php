@@ -7,6 +7,11 @@ use Shuttle\Request;
 use Shuttle\RequestException;
 use Psr\Http\Message\RequestInterface;
 
+/**
+ * @covers Shuttle\RequestException
+ * @covers Shuttle\Request
+ * @covers Shuttle\Uri
+ */
 class RequestExceptionTest extends TestCase
 {
     public function test_request_exception_returns_request_instance()

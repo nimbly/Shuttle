@@ -6,6 +6,10 @@ use PHPUnit\Framework\TestCase;
 use Shuttle\Response;
 use Shuttle\ResponseStatus;
 
+/**
+ * @covers Shuttle\Response
+ * @covers Shuttle\ResponseStatus
+ */
 class ResponseTest extends TestCase
 {
     public function test_reason_phrase_set_on_constructor()

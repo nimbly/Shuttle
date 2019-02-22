@@ -1,3 +1,3 @@
 vendor/
-debug/
+build/
 .phpunit.result.cache

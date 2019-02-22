@@ -5,6 +5,11 @@ namespace Shuttle\Tests;
 use PHPUnit\Framework\TestCase;
 use Shuttle\Body\XmlBody;
 
+/**
+ * @covers Shuttle\Body\XmlBody
+ * @covers Shuttle\Body\BufferBody
+ * @covers Shuttle\Stream\BufferStream
+ */
 class XmlBodyTest extends TestCase
 {
     public function test_default_content_type()

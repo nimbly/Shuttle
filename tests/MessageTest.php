@@ -8,6 +8,11 @@ use Shuttle\Body\JsonBody;
 use Shuttle\Body\FormBody;
 use Shuttle\Stream\BufferStream;
 
+/**
+ * @covers Shuttle\MessageAbstract
+ * @covers Shuttle\Request
+ * @covers Shuttle\Stream\BufferStream
+ */
 class MessageTest extends TestCase
 {
     public function test_valid_protocol_versions_allowed()

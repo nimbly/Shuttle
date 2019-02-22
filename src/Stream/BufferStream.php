@@ -36,7 +36,7 @@ class BufferStream implements StreamInterface
     /**
      * @inheritDoc
      */
-    public function close()
+    public function close(): void
     {
         $this->buffer = "";
         return;

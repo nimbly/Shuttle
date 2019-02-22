@@ -5,6 +5,9 @@ namespace Shuttle\Tests;
 use PHPUnit\Framework\TestCase;
 use Shuttle\Uri;
 
+/**
+ * @covers Shuttle\Uri
+ */
 class UriTest extends TestCase
 {
     public function test_missing_protocol_is_rejected()

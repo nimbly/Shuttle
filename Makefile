@@ -4,8 +4,8 @@ analyze:
 	vendor/bin/psalm --show-info=false
 
 report:
-	vendor/bin/psalm --report=debug/psalm.xml
-	sensible-browser debug/psalm.xml
+	vendor/bin/psalm --report=build/logs/psalm.xml
+	sensible-browser build/logs/psalm.xml
 
 test:
 	vendor/bin/phpunit

@@ -6,7 +6,10 @@ use PHPUnit\Framework\TestCase;
 use Shuttle\Request;
 use Shuttle\Uri;
 
-
+/**
+ * @covers Shuttle\Request
+ * @covers Shuttle\Uri
+ */
 class RequestTest extends TestCase
 {
     public function test_with_method_saves_data()

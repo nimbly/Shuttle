@@ -9,6 +9,17 @@ use Shuttle\Shuttle;
 use Shuttle\Stream\BufferStream;
 use Shuttle\Handler\HandlerAbstract;
 
+/**
+ * @covers Shuttle\Shuttle
+ * @covers Shuttle\Handler\MockHandler
+ * @covers Shuttle\Handler\CurlHandler
+ * @covers Shuttle\MessageAbstract
+ * @covers Shuttle\Request
+ * @covers Shuttle\Response
+ * @covers Shuttle\ResponseStatus
+ * @covers Shuttle\Stream\BufferStream
+ * @covers Shuttle\Uri
+ */
 class ShuttleTest extends TestCase
 {
     public function test_shuttle_creates_default_handler()

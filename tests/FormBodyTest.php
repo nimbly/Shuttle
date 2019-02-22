@@ -5,6 +5,11 @@ namespace Shuttle\Tests;
 use PHPUnit\Framework\TestCase;
 use Shuttle\Body\FormBody;
 
+/**
+ * @covers Shuttle\Body\FormBody
+ * @covers Shuttle\Body\BufferBody
+ * @covers Shuttle\Stream\BufferStream
+ */
 class FormBodyTest extends TestCase
 {
     public function test_default_content_type()

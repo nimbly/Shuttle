@@ -17,7 +17,8 @@
     "require-dev": {
         "symfony/var-dumper": "^4.2",
         "vimeo/psalm": "^3.0",
-        "phpunit/phpunit": "^8.0"
+        "phpunit/phpunit": "^8.0",
+        "php-coveralls/php-coveralls": "^2.1"
     },
     "suggest": {
         "ext-curl": "Use cURL library to make HTTP calls."
