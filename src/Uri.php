@@ -71,7 +71,7 @@ class Uri implements UriInterface
     public function __construct($url = null)
     {
         if( $url ){
-            $scheme = "([\w]+)\:\/\/";
+            $scheme = "(https?)\:\/\/";
             $authorization = "(\w+)\:(\w+)?@";
             $host = "[a-z0-9\-\.]+";
             $port = "\:([0-9]+)";
@@ -79,7 +79,7 @@ class Uri implements UriInterface
             $query = "(?:[\w\[\]\_]+\=[^&^#]+&?)+";
             $fragment = "#([0-9a-zA-Z\!\$&'\(\)\*\+\,;\=\-\.\_\~\:\@\/\?]+)";
     
-            preg_match("/^(?:{$scheme})(?:{$authorization})?({$host})(?:{$port})?({$path})?(?:\?({$query}))?(?:{$fragment})?$/", $url, $match, PREG_UNMATCHED_AS_NULL);
+            preg_match("/^(?:{$scheme})(?:{$authorization})?({$host})(?:{$port})?({$path})?(?:\?({$query}))?(?:{$fragment})?$/i", $url, $match, PREG_UNMATCHED_AS_NULL);
     
             // Check that supplied URI is valid.
             if( empty($match[1]) ||
