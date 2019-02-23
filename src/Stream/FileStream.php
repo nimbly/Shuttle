@@ -8,6 +8,25 @@ use Psr\Http\Message\StreamInterface;
 class FileStream implements StreamInterface
 {
     /**
+     * Array of file modes broken into readable and writeable.
+     *
+     * @var array
+     */
+    private $fileModes = [
+        "readable" => [
+            "r", "r+", "w+", "a+", "x+", "c+",
+            "rb", "r+b", "w+b", "a+b", "x+b", "c+b",
+            "rt", "r+t", "w+t", "a+t", "x+t", "c+t",
+        ],
+
+        "writeable" => [
+            "w", "w+", "r+", "a", "a+", "x", "x+", "c", "c+",
+            "wb", "w+b", "r+b", "ab", "a+b", "xb", "x+b", "cb", "c+b",
+            "wt", "w+t", "r+t", "at", "a+t", "xt", "x+t", "ct", "c+t",
+        ],
+    ];
+
+    /**
      * Stream resource.
      *
      * @var resource
@@ -101,7 +120,8 @@ class FileStream implements StreamInterface
      */
     public function isWritable()
     {
-        return $this->getMetadata('writeable');
+        $mode = strtolower($this->getMetadata('mode'));
+        return in_array($mode, $this->fileModes['writeable']);        
     }
 
     /**
@@ -117,7 +137,8 @@ class FileStream implements StreamInterface
      */
     public function isReadable()
     {
-        return true;
+        $mode = strtolower($this->getMetadata('mode'));
+        return in_array($mode, $this->fileModes['readable']);        
     }
 
     /**
