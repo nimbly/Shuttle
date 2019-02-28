@@ -4,11 +4,14 @@ namespace Shuttle\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Shuttle\Request;
+use Shuttle\Stream\BufferStream;
 use Shuttle\Uri;
 
 /**
  * @covers Shuttle\Request
  * @covers Shuttle\Uri
+ * @covers Shuttle\Stream\BufferStream
+ * @covers Shuttle\MessageAbstract
  */
 class RequestTest extends TestCase
 {
@@ -57,5 +60,38 @@ class RequestTest extends TestCase
         $newRequest = $request->withRequestTarget("GET example.com:443 HTTP/1.1");
 
         $this->assertNotEquals($request, $newRequest);
+    }
+
+    public function test_request_constructor()
+    {
+        $request = new Request(
+            "post",
+            "http://example.com",
+            "OK",
+            [
+                "Accept-Language" => "en_US"
+            ],
+            2
+        );
+
+        $this->assertEquals("POST", $request->getMethod());
+        $this->assertEquals("http://example.com:80/", (string) $request->getUri());
+        $this->assertEquals("OK", $request->getBody()->getContents());
+        $this->assertEquals("en_US", $request->getHeader("Accept-Language")[0]);
+        $this->assertEquals(2, $request->getProtocolVersion());
+    }
+
+    public function test_make_factory()
+    {
+        $request = Request::make(
+            "post",
+            new Uri("http://example.com"),
+            new BufferStream("OK"),
+            [
+                "Accept-Language" => "en_US"
+            ],
+            2);
+
+        $this->assertTrue(($request instanceof Request));
     }
 }

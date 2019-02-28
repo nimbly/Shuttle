@@ -57,6 +57,14 @@ class MessageTest extends TestCase
         $this->assertTrue(is_array($request->getHeader("Content-Type")));
     }
 
+    public function test_get_header_returns_null_if_header_not_found()
+    {
+        $request = new Request;
+        $header = $request->getHeader("X-Foo");
+
+        $this->assertNull($header);
+    }
+
     public function test_with_header_replaces_existing_header()
     {
         $request = (new Request)->withHeader("Content-Type", "application/json");
@@ -84,5 +92,14 @@ class MessageTest extends TestCase
         $request = $request->withoutHeader("X-Foo");
 
         $this->assertFalse($request->hasHeader("X-Foo"));
+    }
+
+    public function test_without_header_returns_same_instance_if_header_not_found()
+    {
+        $request = new Request;
+
+        $newRequest = $request->withoutHeader("X-Foo");
+
+        $this->assertEquals($request, $newRequest);
     }
 }

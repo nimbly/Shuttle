@@ -5,6 +5,8 @@ namespace Shuttle\Tests;
 use PHPUnit\Framework\TestCase;
 use Shuttle\Handler\CurlHandler;
 use Shuttle\Request;
+use Shuttle\Response;
+use Shuttle\Stream\BufferStream;
 
 /**
  * @covers Shuttle\Handler\CurlHandler
@@ -12,6 +14,9 @@ use Shuttle\Request;
  * @covers Shuttle\Request
  * @covers Shuttle\MessageAbstract
  * @covers Shuttle\Uri
+ * @covers Shuttle\Response
+ * @covers Shuttle\Stream\BufferStream
+ * @covers Shuttle\ResponseStatus
  */
 class CurlHandlerTest extends TestCase
 {
@@ -195,5 +200,38 @@ class CurlHandlerTest extends TestCase
             "X-Bar: Foo",
             $headers[1]
         );
+    }
+
+    public function test_curl_request_options()
+    {
+        $curlHandler = new CurlHandler;
+        $reflection = new \ReflectionClass($curlHandler);
+
+        $request = new Request("post", "http://example.com", new BufferStream("OK"));
+        $response = new Response;
+
+        $method = $reflection->getMethod('buildCurlRequestOptions');
+        $method->setAccessible(true);
+        $requestOptions = $method->invokeArgs($curlHandler, [$request, &$response]);
+
+        $this->assertEquals(CURL_HTTP_VERSION_1_1, $requestOptions[CURLOPT_HTTP_VERSION]);
+        $this->assertEquals("POST", $requestOptions[CURLOPT_CUSTOMREQUEST]);
+        $this->assertEquals(80, $requestOptions[CURLOPT_PORT]);
+        $this->assertEquals("http://example.com:80/", $requestOptions[CURLOPT_URL]);
+        $this->assertEquals([], $requestOptions[CURLOPT_HTTPHEADER]);
+        $this->assertTrue(is_callable($requestOptions[CURLOPT_WRITEFUNCTION]));
+        $this->assertTrue(is_callable($requestOptions[CURLOPT_HEADERFUNCTION]));
+        $this->assertEquals("OK", $requestOptions[CURLOPT_POSTFIELDS]);
+    }
+
+    public function test_execute_request()
+    {
+        $curlHandler = new CurlHandler;
+
+        $response = $curlHandler->execute(
+            new Request("get", "https://github.com")
+        );
+
+        $this->assertTrue(($response instanceof Response));
     }
 }

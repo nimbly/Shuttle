@@ -104,15 +104,13 @@ class Uri implements UriInterface
      * @param string $scheme
      * @return int
      */
-    private function derivePortFromScheme($scheme)
+    private function derivePortFromScheme($scheme): int
     {
-        switch(strtolower($scheme)){
-            case 'https':
-                return 443;
-
-            default:
-                return 80;
+        if( strtolower($scheme) === 'https' ){
+            return 443;
         }
+
+        return 80;
     }
 
     /**
