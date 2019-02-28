@@ -157,7 +157,7 @@ abstract class MessageAbstract implements MessageInterface
      * @param array $headers
      * @return void
      */
-    protected function setHeaders(array $headers)
+    protected function setHeaders(array $headers): void
     {
         foreach( $headers as $name => $value ){
             $this->headers[$name] = [$value];
@@ -166,14 +166,16 @@ abstract class MessageAbstract implements MessageInterface
 
     /**
      * @inheritDoc
+     * @return StreamInterface|null
      */
-    public function getBody()
+    public function getBody(): ?StreamInterface
     {
         return $this->body;
     }
 
     /**
      * @inheritDoc
+     * @return MessageInterface
      */
     public function withBody(StreamInterface $body)
     {

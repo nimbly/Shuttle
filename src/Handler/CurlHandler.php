@@ -97,7 +97,43 @@ class CurlHandler extends HandlerAbstract
         );
 
         // Set the default cURL options
-        curl_setopt_array($handler, $this->options + [
+        curl_setopt_array($handler, $this->options + $this->buildCurlRequestOptions($request, $response));
+
+        // Attempt to execute the request
+        if( curl_exec($handler) === false ){
+            throw new RequestException($request, curl_strerror(curl_errno($handler)), curl_errno($handler));
+        }
+
+        // Rewind the body before passing it back.
+        if( $response->getBody()->isSeekable() ){
+            $response->getBody()->rewind();
+        }
+
+        return $response;
+    }
+
+    /**
+     * Make the php://temp response stream.
+     *
+     * @return StreamInterface
+     */
+    private function makeResponseBodyStream(): StreamInterface
+    {
+        return new FileStream(
+            fopen("php://temp/maxmemory:{$this->maxResponseBodyMemory}", "w+")
+        );
+    }
+
+    /**
+     * Build the cURL option set for the given request.
+     *
+     * @param RequestInterface $request
+     * @param Response $response
+     * @return array
+     */
+    private function buildCurlRequestOptions(RequestInterface $request, Response &$response): array
+    {
+        $curlOptions = [
 
             CURLOPT_HTTP_VERSION => $this->buildRequestHttpProtocolVersion($request),
             CURLOPT_CUSTOMREQUEST => $request->getMethod(),
@@ -125,38 +161,16 @@ class CurlHandler extends HandlerAbstract
 
             }
 
-        ]);
+        ];
 
         // Set the request body (if applicable)
         if( $request->getBody() &&
             in_array($request->getMethod(), ["POST", "PUT", "PATCH"]) ){
 
-            curl_setopt($handler, CURLOPT_POSTFIELDS, $request->getBody()->getContents());
+            $curlOptions[CURLOPT_POSTFIELDS] = $request->getBody()->getContents();
         }
 
-        // Attempt to execute the request
-        if( curl_exec($handler) === false ){
-            throw new RequestException($request, curl_strerror(curl_errno($handler)), curl_errno($handler));
-        }
-
-        // Rewind the body before passing it back.
-        if( $response->getBody()->isSeekable() ){
-            $response->getBody()->rewind();
-        }
-
-        return $response;
-    }
-
-    /**
-     * Make the php://temp response stream.
-     *
-     * @return StreamInterface
-     */
-    private function makeResponseBodyStream(): StreamInterface
-    {
-        return new FileStream(
-            fopen("php://temp/maxmemory:{$this->maxResponseBodyMemory}", "w+")
-        );
+        return $curlOptions;
     }
 
     /**
