@@ -18,6 +18,12 @@ class XmlBodyTest extends TestCase
         $this->assertEquals("application/xml", $xmlBody->getContentType());
     }
 
+    public function test_override_content_type()
+    {
+        $xmlBody = new XmlBody("", "application/xhtml+xml");
+        $this->assertEquals("application/xhtml+xml", $xmlBody->getContentType());
+    }
+
     public function test_form_body_transformation()
     {
         $content = <<<XML

@@ -19,6 +19,13 @@ class FormBodyTest extends TestCase
         $this->assertEquals("application/x-www-form-urlencoded", $formBody->getContentType());
     }
 
+    public function test_override_content_type()
+    {
+        $formBody = new FormBody([], "multipart/form-data");
+
+        $this->assertEquals("multipart/form-data", $formBody->getContentType());
+    }
+
     public function test_form_body_transformation()
     {
         $formBody = new FormBody(

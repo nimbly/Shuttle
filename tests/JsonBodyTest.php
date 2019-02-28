@@ -19,7 +19,14 @@ class JsonBodyTest extends TestCase
         $this->assertEquals("application/json", $jsonBody->getContentType());
     }
 
-    public function test_form_body_transformation()
+    public function test_override_content_type()
+    {
+        $jsonBody = new JsonBody([], "application/vnd.api+json");
+
+        $this->assertEquals("application/vnd.api+json", $jsonBody->getContentType());
+    }
+
+    public function test_json_encoding()
     {
         $jsonBody = new JsonBody(
             [

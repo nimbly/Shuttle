@@ -22,6 +22,11 @@ use Shuttle\Handler\HandlerAbstract;
  */
 class ShuttleTest extends TestCase
 {
+    public function test_default_user_agent_prefix()
+    {
+        $this->assertEquals("Shuttle/1.0", SHUTTLE_USER_AGENT);
+    }
+    
     public function test_shuttle_creates_default_handler()
     {
         $shuttle = new Shuttle;

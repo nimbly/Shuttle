@@ -5,10 +5,13 @@ namespace Shuttle\Tests;
 use PHPUnit\Framework\TestCase;
 use Shuttle\Response;
 use Shuttle\ResponseStatus;
+use Shuttle\Stream\BufferStream;
 
 /**
  * @covers Shuttle\Response
  * @covers Shuttle\ResponseStatus
+ * @covers Shuttle\MessageAbstract
+ * @covers Shuttle\Stream\BufferStream
  */
 class ResponseTest extends TestCase
 {
@@ -68,5 +71,19 @@ class ResponseTest extends TestCase
     {
         $response = (new Response)->withStatus(503);
         $this->assertFalse($response->isSuccessful());
+    }
+
+    public function test_make_factory()
+    {
+        $response = Response::make(
+            201,
+            new BufferStream("OK"),
+            [
+                "X-Foo" =>"Bar",
+            ],
+            2
+        );
+
+        $this->assertTrue(($response instanceof Response));
     }
 }
