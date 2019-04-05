@@ -1,6 +1,6 @@
 {
     "name": "nimbly/shuttle",
-    "description": "Simple PSR-7 HTTP client.",
+    "description": "Simple PSR-18 HTTP client.",
     "type": "library",
     "keywords": [
         "http",
@@ -8,7 +8,7 @@
         "http client",
         "curl",
         "stream context",
-        "psr-7"
+        "psr-18"
     ],
     "require": {
         "php": "^7.2",
@@ -16,7 +16,6 @@
         "nimbly/capsule": "^0.2"
     },
     "require-dev": {
-        "symfony/var-dumper": "^4.2",
         "vimeo/psalm": "^3.0",
         "phpunit/phpunit": "^8.0",
         "php-coveralls/php-coveralls": "^2.1"
