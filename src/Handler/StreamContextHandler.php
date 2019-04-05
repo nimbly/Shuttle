@@ -4,8 +4,8 @@ namespace Shuttle\Handler;
 
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamInterface;
-use Shuttle\Response;
-use Shuttle\Stream\FileStream;
+use Capsule\Response;
+use Capsule\Stream\FileStream;
 use Shuttle\RequestException;
 
 class StreamContextHandler extends HandlerAbstract

@@ -2,7 +2,13 @@
 
 namespace Shuttle\Body;
 
-
+/**
+ * @package Shuttle\Body
+ * 
+ * Passes raw XML data through.
+ * 
+ * Sets the Content-Type as "application/xml" by default.
+ */
 class XmlBody extends BufferBody implements BodyInterface
 {
     /**

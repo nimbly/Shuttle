@@ -4,19 +4,12 @@ namespace Shuttle\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Shuttle\Handler\CurlHandler;
-use Shuttle\Request;
-use Shuttle\Response;
-use Shuttle\Stream\BufferStream;
+use Capsule\Request;
+use Capsule\Response;
+use Capsule\Stream\BufferStream;
 
 /**
  * @covers Shuttle\Handler\CurlHandler
- * @covers Shuttle\Stream\FileStream
- * @covers Shuttle\Request
- * @covers Shuttle\MessageAbstract
- * @covers Shuttle\Uri
- * @covers Shuttle\Response
- * @covers Shuttle\Stream\BufferStream
- * @covers Shuttle\ResponseStatus
  */
 class CurlHandlerTest extends TestCase
 {

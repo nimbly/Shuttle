@@ -3,14 +3,12 @@
 namespace Shuttle\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Shuttle\Request;
+use Capsule\Request;
 use Shuttle\RequestException;
 use Psr\Http\Message\RequestInterface;
 
 /**
  * @covers Shuttle\RequestException
- * @covers Shuttle\Request
- * @covers Shuttle\Uri
  */
 class RequestExceptionTest extends TestCase
 {

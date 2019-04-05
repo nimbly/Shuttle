@@ -2,7 +2,7 @@
 
 namespace Shuttle\Handler;
 
-use Shuttle\Response;
+use Capsule\Response;
 use Psr\Http\Message\RequestInterface;
 
 

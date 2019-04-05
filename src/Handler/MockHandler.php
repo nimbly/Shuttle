@@ -3,7 +3,7 @@
 namespace Shuttle\Handler;
 
 use Psr\Http\Message\RequestInterface;
-use Shuttle\Response;
+use Capsule\Response;
 
 class MockHandler extends HandlerAbstract
 {

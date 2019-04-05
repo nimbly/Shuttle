@@ -7,7 +7,7 @@ namespace Shuttle\Body;
  * 
  * Formats an associative array as a JSON encoded string.
  * 
- * Sets the Content-Type as "application/json".
+ * Sets the Content-Type as "application/json" by default.
  */
 class JsonBody extends BufferBody implements BodyInterface
 {

@@ -7,7 +7,7 @@ namespace Shuttle\Body;
  * 
  * Format a key => value pair array into a Form Urlencoded string.
  * 
- * Sets Content-Type as "application/x-www-form-urlencoded".
+ * Sets Content-Type as "application/x-www-form-urlencoded" by default.
  * 
  */
 class FormBody extends BufferBody implements BodyInterface
@@ -30,5 +30,24 @@ class FormBody extends BufferBody implements BodyInterface
         if( $contentType ){
             $this->contentType = $contentType;
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getMultiPart(string $boundary, ?string $name = null): string
+    {
+        // Convert the form data back into an array
+        parse_str($this->buffer, $formFields);
+
+        $multiPart = "";
+
+        foreach( $formFields as $name => $value ){
+            $multiPart .= "\r\n{$boundary}\r\n";
+            $multiPart .= 'Content-Disposition: form-data; name="' . $name . '"' . "\r\n\r\n";
+            $multiPart .= $value;
+        }
+
+        return $multiPart;
     }
 }

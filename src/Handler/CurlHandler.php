@@ -5,9 +5,9 @@ namespace Shuttle\Handler;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Shuttle\RequestException;
-use Shuttle\Response;
+use Capsule\Response;
 use Shuttle\Shuttle;
-use Shuttle\Stream\FileStream;
+use Capsule\Stream\FileStream;
 
 class CurlHandler extends HandlerAbstract
 {
@@ -166,7 +166,6 @@ class CurlHandler extends HandlerAbstract
         // Set the request body (if applicable)
         if( $request->getBody() &&
             in_array($request->getMethod(), ["POST", "PUT", "PATCH"]) ){
-
             $curlOptions[CURLOPT_POSTFIELDS] = $request->getBody()->getContents();
         }
 
@@ -216,6 +215,13 @@ class CurlHandler extends HandlerAbstract
         foreach( $request->getHeaders() as $name => $values ){
             foreach( $values as $value ){
                 $headers[] = "{$name}: {$value}";
+            }
+        }
+
+        // Add the Content-Length
+        if( $request->getBody() ){
+            if( !$request->hasHeader('Content-Length') ){
+                $headers[] = "Content-Length: {$request->getBody()->getSize()}";
             }
         }
 

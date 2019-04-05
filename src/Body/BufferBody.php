@@ -2,13 +2,14 @@
 
 namespace Shuttle\Body;
 
-use Shuttle\Stream\BufferStream;
+use Capsule\Stream\BufferStream;
 
 /**
  * @package Shuttle\Body
  * 
- * A generic string buffer body with no formatting/serialization or
- * default Content-Type.
+ * A generic string buffer body with no formatting/serialization.
+ * 
+ * Sets the Content-Type as "text/plain" by default.
  * 
  */
 class BufferBody extends BufferStream implements BodyInterface
@@ -20,7 +21,7 @@ class BufferBody extends BufferStream implements BodyInterface
      *
      * @var string
      */
-    protected $contentType;
+    protected $contentType = "text/plain";
 
     /**
      * BufferBody constructor.
@@ -38,12 +39,23 @@ class BufferBody extends BufferStream implements BodyInterface
     }
 
     /**
-     * Get the Content-Type header data for this body.
-     *
-     * @return string
+     * @inheritDoc
      */
     public function getContentType(): string
     {
         return $this->contentType;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getMultiPart(string $boundary, string $name): string
+    {
+        $multipart  = "\r\n{$boundary}\r\n";
+        $multipart .= "Content-Disposition: form-data; name=\"{$name}\"\r\n";
+        $multipart .= "Content-Type: {$this->getContentType()}\r\n\r\n";
+        $multipart .= $this->buffer;
+
+        return $multipart;
     }
 }
