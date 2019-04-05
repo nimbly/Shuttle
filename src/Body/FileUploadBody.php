@@ -2,6 +2,7 @@
 
 namespace Shuttle\Body;
 
+use Capsule\Stream\FileStream;
 use Psr\Http\Message\StreamInterface;
 
 
