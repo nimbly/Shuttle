@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/github/license/nimbly/Shuttle.svg?style=flat-square)](https://packagist.org/packages/nimbly/Shuttle)
 
 
-A simple PSR-7 HTTP library.
+A simple PSR-18 HTTP client library.
 
 ## Installation
 ```bash
@@ -15,12 +15,13 @@ composer require nimbly/shuttle
 ```
 
 ## Features
-* PSR-7 implementation of Request and Response objects.
 * Responses create php://temp response body stream and swap to disk when necessary.
 * cURL (default) and Stream Context handlers supported.
 * Middleware support out of the box.
 * Easy body transformations when creating requests with JsonBody, FormBody, and XmlBody helper classes.
 
+## Not features
+* Asynchronous calls.
 
 ## Making requests: The easy way
 
@@ -74,9 +75,9 @@ If code reusability and portability is your thing, future proof your code by mak
 
 ```php
 
-use Shuttle\Request;
+use Capsule\Request;
+use Capsule\Uri;
 use Shuttle\Shuttle;
-use Shuttle\Uri;
 
 // Build Request message.
 $request = new Request;
