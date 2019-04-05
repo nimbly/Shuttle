@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "93a34e5720aa60a1e6571281b26f2ec0",
+    "content-hash": "9247ffd812630b2a84e9f5a6aa3c6089",
     "packages": [
         {
             "name": "nimbly/capsule",
-            "version": "0.1",
+            "version": "0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nimbly/Capsule.git",
-                "reference": "39cf5766c59f25368c1f4afc521d952663532836"
+                "reference": "172e73cde2424a054a8932bb0d19d8de39600e30"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nimbly/Capsule/zipball/39cf5766c59f25368c1f4afc521d952663532836",
-                "reference": "39cf5766c59f25368c1f4afc521d952663532836",
+                "url": "https://api.github.com/repos/nimbly/Capsule/zipball/172e73cde2424a054a8932bb0d19d8de39600e30",
+                "reference": "172e73cde2424a054a8932bb0d19d8de39600e30",
                 "shasum": ""
             },
             "require": {
@@ -45,7 +45,7 @@
                 }
             ],
             "description": "PSR-7 implementation",
-            "time": "2019-04-05T19:53:12+00:00"
+            "time": "2019-04-05T22:05:01+00:00"
         },
         {
             "name": "psr/http-client",

@@ -2,6 +2,7 @@
 
 namespace Shuttle\Tests;
 
+use Capsule\Request;
 use Capsule\Response;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -11,6 +12,7 @@ use Shuttle\Tests\src\RequestMiddleware;
 
 /**
  * @covers Shuttle\Shuttle
+ * @covers Shuttle\Handler\MockHandler
  */
 class MiddlewareTest extends TestCase
 {
@@ -39,8 +41,7 @@ class MiddlewareTest extends TestCase
             [$shuttle->getHandler(), 'execute']
         ]);
 
-        //dd($middleware);
-
+        $response = call_user_func($middleware, new Request);
 
         $this->assertEquals("Foo", $response->getHeader("X-Middleware")[0]);
     }
