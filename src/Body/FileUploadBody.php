@@ -1,12 +1,17 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Shuttle\Body;
 
 use Capsule\Stream\FileStream;
 use Psr\Http\Message\StreamInterface;
 
-
-class FileUploadBody extends BufferBody implements BodyInterface
+/**
+ * @package Shuttle\Body
+ * 
+ * Useable only within in a MultpartFormBody.
+ * 
+ */
+class FileUploadBody extends BufferBody
 {
     /**
      * File contents to upload.
@@ -30,28 +35,13 @@ class FileUploadBody extends BufferBody implements BodyInterface
     protected $fileContentType;
 
     /**
-     * The content type.
-     *
-     * @var string
-     */
-    protected $contentType = "multipart/form-data;boundary=--0425150128197707252015Z";
-
-    /**
-     * Boundary
-     *
-     * @var string
-     */
-    protected $boundary = "--0425150128197707252015Z";
-
-    /**
      * FileUpload constructor
      *
      * @param StreamInterface|string $file StreamInterface instance of file or the full path of file to open.
-     * @param string $fileName File name to send with request.
-     * @param string $contentType File mime content type.
-     * @param string 
+     * @param string|null $fileName Filename to assign to content.
+     * @param string|null $contentType File mime content type.
      */
-    public function __construct(string $file, string $fileName, string $contentType)
+    public function __construct($file, ?string $fileName = null, string $contentType = null)
     {
         if( ($file instanceof StreamInterface) === false ){
             $this->stream = new FileStream(
@@ -64,11 +54,9 @@ class FileUploadBody extends BufferBody implements BodyInterface
 
         else {
             $this->stream = $file;
-            $this->fileName = $fileName ?? "filename";
-            $this->fileContentType = $file->getMetadata();
+            $this->fileName = $fileName ?? basename($file->getMetadata('uri') ?? "file");
+            $this->fileContentType = $contentType ?? 'text/plain';
         }
-
-        $this->buffer = $this->getMultiPart($this->boundary, $name ?? "file") . "\n--{$this->boundary}--";
     }
 
     /**
@@ -82,9 +70,10 @@ class FileUploadBody extends BufferBody implements BodyInterface
         }
         
         // Build out multi-part
-        $multipart = "\r\n{$boundary}\r\n";
+        $multipart = "\r\n--{$boundary}\r\n";
         $multipart .= "Content-Disposition: form-data; name=\"{$name}\"; filename=\"{$this->fileName}\"\r\n";
-        $multipart .= "Content-Type: {$this->stream->getContentType()}\r\n\r\n";
+        $multipart .= "Content-Type: {$this->fileContentType}\r\n";
+        $multipart .= "Content-Length: {$this->stream->getSize()}\r\n\r\n";
         $multipart .= $this->stream->getContents();
 
         return $multipart;

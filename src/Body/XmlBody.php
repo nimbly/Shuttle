@@ -9,7 +9,7 @@ namespace Shuttle\Body;
  * 
  * Sets the Content-Type as "application/xml" by default.
  */
-class XmlBody extends BufferBody implements BodyInterface
+class XmlBody extends BufferBody
 {
     /**
      * @inheritDoc

@@ -13,12 +13,13 @@
     "require": {
         "php": "^7.2",
         "psr\/http-client": "^1.0",
-        "nimbly\/capsule": "^0.2"
+        "nimbly\/capsule": "^0.3"
     },
     "require-dev": {
         "vimeo\/psalm": "^3.0",
         "phpunit\/phpunit": "^8.0",
-        "php-coveralls\/php-coveralls": "^2.1"
+        "php-coveralls\/php-coveralls": "^2.1",
+        "symfony/var-dumper": "^4.2"
     },
     "suggest": {
         "ext-curl": "Use cURL library to make HTTP calls."

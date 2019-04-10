@@ -211,7 +211,6 @@ class CurlHandlerTest extends TestCase
         $this->assertEquals("POST", $requestOptions[CURLOPT_CUSTOMREQUEST]);
         $this->assertEquals(80, $requestOptions[CURLOPT_PORT]);
         $this->assertEquals("http://example.com:80/", $requestOptions[CURLOPT_URL]);
-        $this->assertEquals(["Content-Length: 2"], $requestOptions[CURLOPT_HTTPHEADER]);
         $this->assertTrue(is_callable($requestOptions[CURLOPT_WRITEFUNCTION]));
         $this->assertTrue(is_callable($requestOptions[CURLOPT_HEADERFUNCTION]));
         $this->assertEquals("OK", $requestOptions[CURLOPT_POSTFIELDS]);

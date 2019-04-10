@@ -2,10 +2,10 @@
 
 namespace Shuttle\Tests;
 
+use Shuttle\Body\BufferBody;
 use Capsule\Response;
 use Capsule\Stream\BufferStream;
 use PHPUnit\Framework\TestCase;
-use Shuttle\Body\BufferBody;
 use Shuttle\Handler\HandlerAbstract;
 use Shuttle\Handler\MockHandler;
 use Shuttle\Shuttle;

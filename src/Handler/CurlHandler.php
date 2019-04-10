@@ -218,13 +218,6 @@ class CurlHandler extends HandlerAbstract
             }
         }
 
-        // Add the Content-Length
-        if( $request->getBody() ){
-            if( !$request->hasHeader('Content-Length') ){
-                $headers[] = "Content-Length: {$request->getBody()->getSize()}";
-            }
-        }
-
         return $headers;
     }
 }

@@ -198,11 +198,17 @@ class Shuttle implements ClientInterface
 
         // Add body and Content-Type header
         if( $body ){
-            $request = $request->withBody($body);
 
-            if( $body instanceof BodyInterface ){
+            if( $body instanceof BodyInterface &&
+                $request->hasHeader('Content-Type') === false ){
                 $request = $request->withHeader("Content-Type", $body->getContentType());
             }
+
+            if( $request->hasHeader('Content-Length') === false ){
+                $request = $request->withHeader("Content-Length", $body->getSize());
+            }
+
+            $request = $request->withBody($body);
         }
 
         // Add request specific headers.

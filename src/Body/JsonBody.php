@@ -9,7 +9,7 @@ namespace Shuttle\Body;
  * 
  * Sets the Content-Type as "application/json" by default.
  */
-class JsonBody extends BufferBody implements BodyInterface
+class JsonBody extends BufferBody
 {
     /**
      * @inheritDoc

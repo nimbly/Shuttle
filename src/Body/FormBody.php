@@ -10,7 +10,7 @@ namespace Shuttle\Body;
  * Sets Content-Type as "application/x-www-form-urlencoded" by default.
  * 
  */
-class FormBody extends BufferBody implements BodyInterface
+class FormBody extends BufferBody
 {
     /**
      * @inheritDoc
@@ -43,7 +43,7 @@ class FormBody extends BufferBody implements BodyInterface
         $multiPart = "";
 
         foreach( $formFields as $name => $value ){
-            $multiPart .= "\r\n{$boundary}\r\n";
+            $multiPart .= "\r\n--{$boundary}\r\n";
             $multiPart .= 'Content-Disposition: form-data; name="' . $name . '"' . "\r\n\r\n";
             $multiPart .= $value;
         }

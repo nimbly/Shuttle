@@ -2,11 +2,10 @@
 
 namespace Shuttle\Body;
 
-use Shuttle\Body\BodyInterface;
-use Shuttle\Body\FileUpload;
-use Shuttle\Body\FormBody;
+use Capsule\Stream\BufferStream;
 
-class MultipartFormBody extends BufferBody
+
+class MultipartFormBody extends BufferStream implements BodyInterface
 {
     /**
      * Multi-part content type, without boundary.
@@ -16,27 +15,48 @@ class MultipartFormBody extends BufferBody
     protected $contentType = "multipart/form-data";
 
     /**
-     * Boundary
+     * Boundary string.
      *
      * @var string
      */
-    protected $boundary = "--0425150128197707252015Z";
+    protected $boundary;
 
     /**
      * MultipartFormBody constructor.
      *
-     * @param array<BodyInterface> $parts
+     * @param array<string, PartInterface> $parts
      */
     public function __construct(array $parts)
     {
+        // Create a random boundary name for each multipart request.
+        $this->boundary = \uniqid("Capsule") . "Z";
+
+        /**
+         * @var string $name
+         * @var PartInterface $part
+         */
         foreach( $parts as $name => $part ){
 
+            if( !\is_string($name) ){
+                throw new \Exception('Please provide a name for each part of a Multipart request.');
+            }
+
             $this->write(
-                $part->getMultiPart($this->boundary, is_int($name) ? null : $name)
+                $part->getMultiPart($this->boundary, $name)
             );
         }
 
-        $this->write("\r\n{$this->boundary}--\r\n");
+        $this->write("\r\n--{$this->boundary}--\r\n");
+    }
+
+    /**
+     * Get the boundary string.
+     *
+     * @return string
+     */
+    public function getBoundary(): string
+    {
+        return $this->boundary;
     }
 
     /**

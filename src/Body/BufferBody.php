@@ -12,7 +12,7 @@ use Capsule\Stream\BufferStream;
  * Sets the Content-Type as "text/plain" by default.
  * 
  */
-class BufferBody extends BufferStream implements BodyInterface
+class BufferBody extends BufferStream implements BodyInterface, PartInterface
 {
     /**
      * Content-Type header data.
@@ -51,7 +51,7 @@ class BufferBody extends BufferStream implements BodyInterface
      */
     public function getMultiPart(string $boundary, string $name): string
     {
-        $multipart  = "\r\n{$boundary}\r\n";
+        $multipart  = "\r\n--{$boundary}\r\n";
         $multipart .= "Content-Disposition: form-data; name=\"{$name}\"\r\n";
         $multipart .= "Content-Type: {$this->getContentType()}\r\n\r\n";
         $multipart .= $this->buffer;
