@@ -39,6 +39,24 @@ class MultipartFormBodyTest extends TestCase
         );
     }
 
+    public function test_multiple_parts_without_key_throws_exception()
+    {
+        $this->expectException(\Exception::class);
+        
+        $multiPartFormBody = new MultipartFormBody([
+            'form' => new FormBody([
+                'email' => 'user@example.com',
+                'name' => 'Example User',
+            ]),
+
+            new FileUploadBody(
+                new BufferStream("Capsule!"),
+                'plain.txt',
+                'text/plain'
+            )
+        ]);
+    }
+
     public function test_multipart_content_type()
     {
         $multiPartFormBody = new MultipartFormBody([]);

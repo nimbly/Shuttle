@@ -22,4 +22,14 @@ class BufferBodyTest extends TestCase
         $bufferBody = new BufferBody("OK", "text/plain");
         $this->assertEquals("text/plain", $bufferBody->getContentType());
     }
+
+    public function test_get_multipart()
+    {
+        $bufferBody = new BufferBody("OK");
+
+        $this->assertEquals(
+            "\r\n--Capsule\r\nContent-Disposition: form-data; name=\"test\"\r\nContent-Type: text/plain\r\n\r\nOK",
+            $bufferBody->getMultiPart("Capsule", "test")
+        );
+    }
 }
