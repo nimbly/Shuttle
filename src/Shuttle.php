@@ -145,29 +145,15 @@ class Shuttle implements ClientInterface
     }
 
     /**
-     * @inheritDoc
-     */
-    public function sendRequest(RequestInterface $request): ResponseInterface
-    {
-        /**
-         * 
-         * Send the request through the Middleware pipeline.
-         * 
-         */
-        return call_user_func($this->middlewarePipeline, $request);
-    }
-
-    /**
-     * Make a request.
+     * Make a Request instance.
      *
      * @param string $method
      * @param Uri|string $url
      * @param StreamInterface $body
      * @param array $options
-     * @throws RequestException
-     * @return ResponseInterface
+     * @return RequestInterface
      */
-    public function request($method, $url, StreamInterface $body = null, array $options = []): ResponseInterface
+    public function makeRequest($method, $url, StreamInterface $body = null, array $options = []): RequestInterface
     {
         // Build out URI instance
         if( $url instanceof Uri === false ){
@@ -218,7 +204,37 @@ class Shuttle implements ClientInterface
             }
         }
 
-        return $this->sendRequest($request);
+        return $request;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function sendRequest(RequestInterface $request): ResponseInterface
+    {
+        /**
+         * 
+         * Send the request through the Middleware pipeline.
+         * 
+         */
+        return call_user_func($this->middlewarePipeline, $request);
+    }
+
+    /**
+     * Make a request.
+     *
+     * @param string $method
+     * @param Uri|string $url
+     * @param StreamInterface $body
+     * @param array $options
+     * @throws RequestException
+     * @return ResponseInterface
+     */
+    public function request(string $method, $url, StreamInterface $body = null, array $options = []): ResponseInterface
+    {
+        return $this->sendRequest(
+            $this->makeRequest($method, $url, $body, $options)
+        );
     }
 
     /**

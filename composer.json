@@ -19,7 +19,7 @@
         "vimeo\/psalm": "^3.0",
         "phpunit\/phpunit": "^8.0",
         "php-coveralls\/php-coveralls": "^2.1",
-        "symfony/var-dumper": "^4.2"
+        "symfony\/var-dumper": "^4.2"
     },
     "suggest": {
         "ext-curl": "Use cURL library to make HTTP calls."
@@ -47,5 +47,5 @@
     "scripts": {
         "test": "echo \"Run 'make test' instead.\""
     },
-    "version": "0.1"
+    "version": "0.2"
 }
