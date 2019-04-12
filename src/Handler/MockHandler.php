@@ -10,7 +10,7 @@ class MockHandler extends HandlerAbstract
     /**
      * Array of pre-fab Response objects to be returned with requests.
      *
-     * @var Response[]
+     * @var array<Response|callable>
      */
     protected $responses = [];
 
@@ -24,9 +24,10 @@ class MockHandler extends HandlerAbstract
     /**
      * MockHandler constructor.
      * 
-     * Pass in an array of Response instances that will be returned
+     * Pass in an array of Response instances that will be returned. You may also
+     * pass in a closure that takes the Request and must return a Response.
      *
-     * @param array $responses
+     * @param array<Response|callable> $responses
      */
     public function __construct(array $responses)
     {
@@ -42,7 +43,13 @@ class MockHandler extends HandlerAbstract
             throw new \Exception("No more responses available in MockHandler response queue.");
         }
 
-        return array_shift($this->responses);
+        $response = array_shift($this->responses);
+
+        if( is_callable($response) ){
+            $response = $response($request);
+        }
+
+        return $response;
     }
 
     /**
