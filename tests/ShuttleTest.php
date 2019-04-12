@@ -2,10 +2,11 @@
 
 namespace Shuttle\Tests;
 
-use Shuttle\Body\BufferBody;
+use Capsule\Request;
 use Capsule\Response;
 use Capsule\Stream\BufferStream;
 use PHPUnit\Framework\TestCase;
+use Shuttle\Body\BufferBody;
 use Shuttle\Handler\HandlerAbstract;
 use Shuttle\Handler\MockHandler;
 use Shuttle\Shuttle;
@@ -142,5 +143,67 @@ class ShuttleTest extends TestCase
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals("", $response->getBody()->getContents());
+    }
+
+    public function test_send_request_with_default_headers()
+    {
+        $shuttle = new Shuttle([
+            'handler' => new MockHandler([
+
+                function(Request $request): Response {
+                    return new Response(200, new BufferStream("Ok"), ['X-Default-Header' => $request->getHeader('X-Default-Header')[0]]);
+                },
+
+            ]),
+            
+            'headers' => [
+                'X-Default-Header' => 'Capsule!',
+            ]
+        ]);
+
+        $response = $shuttle->get('http://example.com');
+
+        $this->assertTrue($response->hasHeader('X-Default-Header'));
+        $this->assertEquals('Capsule!', $response->getHeader('X-Default-Header')[0]);
+    }
+
+    public function test_send_request_with_added_headers()
+    {
+        $shuttle = new Shuttle([
+            'handler' => new MockHandler([
+
+                function(Request $request): Response {
+                    return new Response(200, new BufferStream("Ok"), ['X-Added-Header' => $request->getHeader('X-Added-Header')[0]]);
+                },
+
+            ])
+        ]);
+
+        $response = $shuttle->get('http://example.com', [
+            'headers' => [
+                'X-Added-Header' => 'Capsule!',
+            ]
+        ]);
+
+        $this->assertTrue($response->hasHeader('X-Added-Header'));
+        $this->assertEquals('Capsule!', $response->getHeader('X-Added-Header')[0]);
+    }
+
+    public function test_setting_debug_mode()
+    {
+        $shuttle = new Shuttle([
+            'handler' => new MockHandler([
+                new Response(200, new BufferStream("Ok"))
+            ]),
+            'debug' => true,
+        ]);
+
+        $mockHandler = $shuttle->getHandler();
+
+        $reflection = new \ReflectionClass($mockHandler);
+        $debug = $reflection->getProperty('debug');
+        $debug->setAccessible(true);
+
+        $this->assertTrue($debug->getValue($mockHandler));        
     }
 }
