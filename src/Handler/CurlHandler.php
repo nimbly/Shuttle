@@ -101,7 +101,7 @@ class CurlHandler extends HandlerAbstract
 
         // Attempt to execute the request
         if( curl_exec($handler) === false ){
-            throw new RequestException($request, curl_strerror(curl_errno($handler)), curl_errno($handler));
+            throw new RequestException($request, curl_strerror(curl_errno($handler)) ?? "Unknown error", curl_errno($handler));
         }
 
         // Rewind the body before passing it back.
@@ -140,13 +140,13 @@ class CurlHandler extends HandlerAbstract
             CURLOPT_PORT => $request->getUri()->getPort(),
             CURLOPT_URL => (string) $request->getUri(),
             CURLOPT_HTTPHEADER => $this->buildRequestHeaders($request),
-            CURLOPT_WRITEFUNCTION => function($handler, $data) use (&$response): int {
+            CURLOPT_WRITEFUNCTION => function($handler, string $data) use (&$response): int {
 
                 return $response->getBody()->write($data);
 
             },
 
-            CURLOPT_HEADERFUNCTION => function($handler, $header) use (&$response): int {
+            CURLOPT_HEADERFUNCTION => function($handler, string $header) use (&$response): int {
 
                 if( preg_match("/^HTTP\/([\d\.]+) ([\d]{3})(?: ([\w\h]+))?\R?+$/i", trim($header), $httpResponse) ){
                     $response = $response->withStatus((int) $httpResponse[2], $httpResponse[3] ?? "");

@@ -125,11 +125,11 @@ class Shuttle implements ClientInterface
         // Create a single nested Lamda with all the Middleware layers being passed on to the next.
         return array_reduce($layers, function(Closure $next, MiddlewareInterface $middleware) {
 
-            return function($request) use ($next, $middleware){
+            return function(RequestInterface $request) use ($next, $middleware): ResponseInterface {
                 return $middleware->process($request, $next);
             };
 
-        }, function($request) use ($kernel) {
+        }, function(RequestInterface $request) use ($kernel): ResponseInterface {
             return $kernel($request);
         });
     }
@@ -191,7 +191,7 @@ class Shuttle implements ClientInterface
             }
 
             if( $request->hasHeader('Content-Length') === false ){
-                $request = $request->withHeader("Content-Length", $body->getSize());
+                $request = $request->withHeader("Content-Length", (string) $body->getSize());
             }
 
             $request = $request->withBody($body);
