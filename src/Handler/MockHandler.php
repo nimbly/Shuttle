@@ -43,10 +43,10 @@ class MockHandler extends HandlerAbstract
             throw new \Exception("No more responses available in MockHandler response queue.");
         }
 
-        $response = array_shift($this->responses);
+        $response = \array_shift($this->responses);
 
-        if( is_callable($response) ){
-            $response = $response($request);
+        if( \is_callable($response) ){
+            return $response($request);
         }
 
         return $response;

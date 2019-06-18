@@ -97,11 +97,11 @@ class CurlHandler extends HandlerAbstract
         );
 
         // Set the default cURL options
-        curl_setopt_array($handler, $this->options + $this->buildCurlRequestOptions($request, $response));
+        \curl_setopt_array($handler, $this->options + $this->buildCurlRequestOptions($request, $response));
 
         // Attempt to execute the request
-        if( curl_exec($handler) === false ){
-            throw new RequestException($request, curl_strerror(curl_errno($handler)) ?? "Unknown error", curl_errno($handler));
+        if( \curl_exec($handler) === false ){
+            throw new RequestException($request, \curl_strerror(\curl_errno($handler)) ?? "Unknown error", \curl_errno($handler));
         }
 
         // Rewind the body before passing it back.
@@ -120,7 +120,7 @@ class CurlHandler extends HandlerAbstract
     private function makeResponseBodyStream(): StreamInterface
     {
         return new FileStream(
-            fopen("php://temp/maxmemory:{$this->maxResponseBodyMemory}", "w+")
+            \fopen("php://temp/maxmemory:{$this->maxResponseBodyMemory}", "w+")
         );
     }
 
@@ -148,16 +148,16 @@ class CurlHandler extends HandlerAbstract
 
             CURLOPT_HEADERFUNCTION => function($handler, string $header) use (&$response): int {
 
-                if( preg_match("/^HTTP\/([\d\.]+) ([\d]{3})(?: ([\w\h]+))?\R?+$/i", trim($header), $httpResponse) ){
+                if( \preg_match("/^HTTP\/([\d\.]+) ([\d]{3})(?: ([\w\h]+))?\R?+$/i", \trim($header), $httpResponse) ){
                     $response = $response->withStatus((int) $httpResponse[2], $httpResponse[3] ?? "");
                     $response = $response->withProtocolVersion($httpResponse[1]);
                 }
 
-                elseif( preg_match("/^([\w\-]+)\: (\N+)\R?+$/", trim($header), $httpHeader) ){
+                elseif( \preg_match("/^([\w\-]+)\: (\N+)\R?+$/", \trim($header), $httpHeader) ){
                     $response = $response->withAddedHeader($httpHeader[1], $httpHeader[2]);
                 }
 
-                return strlen($header);
+                return \strlen($header);
 
             }
 
@@ -165,7 +165,7 @@ class CurlHandler extends HandlerAbstract
 
         // Set the request body (if applicable)
         if( $request->getBody() &&
-            in_array($request->getMethod(), ["POST", "PUT", "PATCH"]) ){
+            \in_array($request->getMethod(), ["POST", "PUT", "PATCH"]) ){
             $curlOptions[CURLOPT_POSTFIELDS] = $request->getBody()->getContents();
         }
 
