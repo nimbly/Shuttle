@@ -37,7 +37,7 @@ class StreamContextHandler extends HandlerAbstract
      */
     public function __construct(array $options = [])
     {
-        $this->options = array_merge($this->options, $options);
+        $this->options = \array_merge($this->options, $options);
     }
 
     /**
@@ -54,25 +54,32 @@ class StreamContextHandler extends HandlerAbstract
      */
     public function execute(RequestInterface $request): Response
     {
-        // Set the context options
-        $contextOptions = array_merge($this->options, [
+        $stream = $this->buildStream($request, ['http' => $this->buildHttpContext($request)]);
+        
+        return $this->createResponse($stream);
+    }
+
+    /**
+     * Build the HTTP context options.
+     *
+     * @param RequestInterface $request
+     * @return array<string, string>
+     */
+    private function buildHttpContext(RequestInterface $request): array
+    {
+        return \array_merge($this->options, [
             'protocol_version' => $request->getProtocolVersion(),
             'method' => $request->getMethod(),
             'header' => $this->buildRequestHeaders($request->getHeaders()),
-            'content' => $request->getBody() ? $request->getBody()->getContents() : null,
+            'content' => $request->getBody() ? $request->getBody()->getContents() : null
         ]);
-
-        // Build the HTTP stream
-        $stream = $this->buildStream($request, ['http' => $contextOptions]);
-        
-        return $this->createResponse($stream);
     }
 
     /**
      * Build the request headers.
      *
      * @param array $requestHeaders
-     * @return array
+     * @return array<string>
      */
     private function buildRequestHeaders(array $requestHeaders): array
     {
@@ -95,7 +102,7 @@ class StreamContextHandler extends HandlerAbstract
      * @throws RequestException
      * @return StreamInterface
      */
-    public function buildStream(RequestInterface $request, array $contextOptions)
+    private function buildStream(RequestInterface $request, array $contextOptions)
     {
         if( $this->debug ){
             $params = [
@@ -103,11 +110,11 @@ class StreamContextHandler extends HandlerAbstract
             ];
         }
 
-        $context = stream_context_create($contextOptions, $params ?? []);
+        $context = \stream_context_create($contextOptions, $params ?? []);
 
-        if( ($stream = @fopen((string) $request->getUri(), 'r', false, $context)) === false ){
+        if( ($stream = @\fopen((string) $request->getUri(), 'r', false, $context)) === false ){
             
-            $error = error_get_last();
+            $error = \error_get_last();
 
             throw new RequestException($request, $error["message"] ?? "Failed to open stream", $error["code"] ?? -1);
 
@@ -128,16 +135,16 @@ class StreamContextHandler extends HandlerAbstract
         $response = $response->withBody($stream);
 
         // Grab the headers from the Stream meta data
-        $headers = $response->getBody()->getMetadata('wrapper_data') ?? [];
+        $headers = $stream->getMetadata('wrapper_data') ?? [];
 
         // Process the headers
         foreach( $headers as $header ){
-            if( preg_match("/^HTTP\/([\d\.]+) ([\d]{3})(?: ([\w\h]+))?\R?+$/i", trim($header), $httpResponse) ){
+            if( \preg_match("/^HTTP\/([\d\.]+) ([\d]{3})(?: ([\w\h]+))?\R?+$/i", \trim($header), $httpResponse) ){
                 $response = $response->withStatus((int) $httpResponse[2], $httpResponse[3] ?? "");
                 $response = $response->withProtocolVersion($httpResponse[1]);
             }
     
-            elseif( preg_match("/^([\w\-]+)\: (\N+)\R?+$/", trim($header), $httpHeader) ){
+            elseif( \preg_match("/^([\w\-]+)\: (\N+)\R?+$/", \trim($header), $httpHeader) ){
                 $response = $response->withAddedHeader($httpHeader[1], $httpHeader[2]);
             }
         }
@@ -156,7 +163,7 @@ class StreamContextHandler extends HandlerAbstract
      * @param int $bytes_max
      * @return void
      */
-    private function debug($notification_code, $severity, $message, $message_code, $bytes_transferred, $bytes_max): void
+    private function debug(int $notification_code, int $severity, string $message, int $message_code, int $bytes_transferred, int $bytes_max): void
     {
         switch( $notification_code ){
 
@@ -205,7 +212,7 @@ class StreamContextHandler extends HandlerAbstract
                 $debug = "Foo";
         }
 
-        $preamble = json_encode([
+        $preamble = \json_encode([
             "noitification_code" => $notification_code,
             "severity" => $severity,
             "message" => $message,
