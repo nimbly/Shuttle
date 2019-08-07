@@ -157,7 +157,7 @@ class Shuttle implements ClientInterface
     {
         // Build out URI instance
         if( $url instanceof Uri === false ){
-            $url = new Uri(
+            $url = Uri::createFromString(
                 ($this->options['base_url'] ?? "") . $url
             );
         }
