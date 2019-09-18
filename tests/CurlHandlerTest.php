@@ -182,17 +182,13 @@ class CurlHandlerTest extends TestCase
         $method->setAccessible(true);
         $headers = $method->invoke($curlHandler, $request);
 
-        $this->assertTrue(is_array($headers));
+        $this->assertTrue(\is_array($headers));
 
-        $this->assertEquals(
-            "X-Foo: Bar",
-            $headers[0]
-        );
-
-        $this->assertEquals(
-            "X-Bar: Foo",
-            $headers[1]
-        );
+        $this->assertEquals([
+			"Host: example.com",
+			"X-Foo: Bar",
+			"X-Bar: Foo",
+		], $headers);
     }
 
     public function test_curl_request_options()
@@ -200,8 +196,8 @@ class CurlHandlerTest extends TestCase
         $curlHandler = new CurlHandler;
         $reflection = new \ReflectionClass($curlHandler);
 
-        $request = new Request("post", "http://example.com", new BufferStream("OK"));
-        $response = new Response;
+        $request = new Request("post", "http://example.com:8000", new BufferStream("OK"));
+        $response = new Response(200);
 
         $method = $reflection->getMethod('buildCurlRequestOptions');
         $method->setAccessible(true);
@@ -209,8 +205,8 @@ class CurlHandlerTest extends TestCase
 
         $this->assertEquals(CURL_HTTP_VERSION_1_1, $requestOptions[CURLOPT_HTTP_VERSION]);
         $this->assertEquals("POST", $requestOptions[CURLOPT_CUSTOMREQUEST]);
-        $this->assertEquals(80, $requestOptions[CURLOPT_PORT]);
-        $this->assertEquals("http://example.com:80/", $requestOptions[CURLOPT_URL]);
+        $this->assertEquals(8000, $requestOptions[CURLOPT_PORT]);
+        $this->assertEquals("http://example.com:8000", $requestOptions[CURLOPT_URL]);
         $this->assertTrue(is_callable($requestOptions[CURLOPT_WRITEFUNCTION]));
         $this->assertTrue(is_callable($requestOptions[CURLOPT_HEADERFUNCTION]));
         $this->assertEquals("OK", $requestOptions[CURLOPT_POSTFIELDS]);

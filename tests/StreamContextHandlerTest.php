@@ -82,7 +82,10 @@ class StreamContextHandlerTest extends TestCase
             'timeout' => 120,
             'method' => 'POST',
             'protocol_version' => '2',
-            'header' => ["X-Header-1: Foo"],
+            'header' => [
+				"Host: example.com",
+				"X-Header-1: Foo"
+			],
             'content' => 'Ok'
         ], $httpContext);
     }

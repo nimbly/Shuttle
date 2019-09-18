@@ -2,19 +2,20 @@
 
 namespace Shuttle\Handler;
 
+use Capsule\Response;
+use Capsule\Stream\FileStream;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Shuttle\RequestException;
-use Capsule\Response;
 use Shuttle\Shuttle;
-use Capsule\Stream\FileStream;
 
 class CurlHandler extends HandlerAbstract
 {
     /**
      * Maximum amount of memory (in bytes) to use before swapping
      * response body to disk.
-     * 
+     *
      * Defaults to 2097152 bytes (2MB).
      *
      * @var integer
@@ -49,13 +50,13 @@ class CurlHandler extends HandlerAbstract
 
     /**
      * CurlHandler constructor.
-     * 
+     *
      * @param array $options Array of CURLOPT_* => value key pairs that is passed into curl handler.
-     * 
+     *
      */
     public function __construct(array $options = [])
     {
-        $this->curlResource = curl_init();
+        $this->curlResource = \curl_init();
         $this->options += $options;
     }
 
@@ -85,14 +86,14 @@ class CurlHandler extends HandlerAbstract
      * Execute the given request.
      *
      * @param RequestInterface $request
-     * @return Response
+     * @return ResponseInterface
      */
-    public function execute(RequestInterface $request): Response
+    public function execute(RequestInterface $request): ResponseInterface
     {
         $handler = $this->curlResource;
 
-        // Create a new Response with php://temp body.
-        $response = (new Response)->withBody(
+        // Create a new Response with php://temp body and set response code to 200 (for now).
+        $response = new Response(200,
             $this->makeResponseBodyStream()
         );
 
@@ -197,7 +198,7 @@ class CurlHandler extends HandlerAbstract
 
     /**
      * Build the processed request header values as an array of header strings.
-     * 
+     *
      * Eg:
      * [
      *      "Content-Type: text/plain",
@@ -205,7 +206,7 @@ class CurlHandler extends HandlerAbstract
      * ]
      *
      * @param RequestInterface $request
-     * @return array
+     * @return array<string>
      */
     private function buildRequestHeaders(RequestInterface $request): array
     {

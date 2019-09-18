@@ -4,9 +4,9 @@ namespace Shuttle\Body;
 
 /**
  * @package Shuttle\Body
- * 
+ *
  * Formats an associative array as a JSON encoded string.
- * 
+ *
  * Sets the Content-Type as "application/json" by default.
  */
 class JsonBody extends BufferBody
@@ -24,7 +24,7 @@ class JsonBody extends BufferBody
      */
     public function __construct(array $data, string $contentType = null)
     {
-        if( ($json = json_encode($data)) === false ){
+        if( ($json = \json_encode($data)) === false ){
             throw new \Exception("Invalid JSON");
         }
 

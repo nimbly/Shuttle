@@ -1,5 +1,5 @@
 {
-    "name": "nimbly\/shuttle",
+    "name": "nimbly/shuttle",
     "description": "Simple PSR-18 HTTP client.",
     "type": "library",
     "keywords": [
@@ -11,15 +11,16 @@
         "psr-18"
     ],
     "require": {
-        "php": "^7.2",
-        "psr\/http-client": "^1.0",
-        "nimbly\/capsule": "^0.7"
+		"php": "^7.2",
+		"ext-json": "*",
+        "psr/http-client": "^1.0",
+        "nimbly/capsule": "^0.7"
     },
     "require-dev": {
-        "vimeo\/psalm": "^3.0",
-        "phpunit\/phpunit": "^8.0",
-        "php-coveralls\/php-coveralls": "^2.1",
-        "symfony\/var-dumper": "^4.2"
+        "vimeo/psalm": "^3.0",
+        "phpunit/phpunit": "^8.0",
+        "php-coveralls/php-coveralls": "^2.1",
+        "symfony/var-dumper": "^4.2"
     },
     "suggest": {
         "ext-curl": "Use cURL library to make HTTP calls."
@@ -33,19 +34,16 @@
     ],
     "autoload": {
         "psr-4": {
-            "Shuttle\\": "src\/"
+            "Shuttle\\": "src/"
         },
         "files": [
-            "src\/functions.php"
+            "src/functions.php"
         ]
     },
     "autoload-dev": {
         "psr-4": {
-            "Shuttle\\Tests\\": "tests\/"
+            "Shuttle\\Tests\\": "tests/"
         }
     },
-    "scripts": {
-        "test": "echo \"Run 'make test' instead.\""
-    },
-    "version": "0.2"
+    "version": "0.3"
 }

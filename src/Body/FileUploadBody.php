@@ -53,7 +53,10 @@ class FileUploadBody extends BufferBody
         }
 
         else {
-            $this->stream = $file;
+			$this->stream = $file;
+			/**
+			 * @psalm-suppress PossiblyInvalidArgument
+			 */
             $this->fileName = $fileName ?? \basename($file->getMetadata('uri') ?? "file");
             $this->fileContentType = $contentType ?? 'text/plain';
         }

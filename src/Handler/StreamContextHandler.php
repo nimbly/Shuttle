@@ -2,10 +2,11 @@
 
 namespace Shuttle\Handler;
 
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\StreamInterface;
 use Capsule\Response;
 use Capsule\Stream\FileStream;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
 use Shuttle\RequestException;
 
 class StreamContextHandler extends HandlerAbstract
@@ -52,10 +53,10 @@ class StreamContextHandler extends HandlerAbstract
     /**
      * @inheritDoc
      */
-    public function execute(RequestInterface $request): Response
+    public function execute(RequestInterface $request): ResponseInterface
     {
         $stream = $this->buildStream($request, ['http' => $this->buildHttpContext($request)]);
-        
+
         return $this->createResponse($stream);
     }
 
@@ -98,11 +99,11 @@ class StreamContextHandler extends HandlerAbstract
      * Build the stream.
      *
      * @param RequestInterface $request
-     * @param array $contextOptions
+     * @param array<string, array<string, mixed>> $contextOptions
      * @throws RequestException
      * @return StreamInterface
      */
-    private function buildStream(RequestInterface $request, array $contextOptions)
+    private function buildStream(RequestInterface $request, array $contextOptions): StreamInterface
     {
         if( $this->debug ){
             $params = [
@@ -113,7 +114,7 @@ class StreamContextHandler extends HandlerAbstract
         $context = \stream_context_create($contextOptions, $params ?? []);
 
         if( ($stream = @\fopen((string) $request->getUri(), 'r', false, $context)) === false ){
-            
+
             $error = \error_get_last();
 
             throw new RequestException($request, $error["message"] ?? "Failed to open stream", $error["code"] ?? -1);
@@ -127,28 +128,27 @@ class StreamContextHandler extends HandlerAbstract
      * Create the Response object from the Stream.
      *
      * @param StreamInterface $stream
-     * @return Response
+     * @return ResponseInterface
      */
-    private function createResponse(StreamInterface $stream): Response
+    private function createResponse(StreamInterface $stream): ResponseInterface
     {
-        $response = new Response;
-        $response = $response->withBody($stream);
+		$response = new Response(200);
 
         // Grab the headers from the Stream meta data
-        $headers = $stream->getMetadata('wrapper_data') ?? [];
+        $responseHeaders = $stream->getMetadata('wrapper_data') ?? [];
 
         // Process the headers
-        foreach( $headers as $header ){
+        foreach( $responseHeaders as $header ){
             if( \preg_match("/^HTTP\/([\d\.]+) ([\d]{3})(?: ([\w\h]+))?\R?+$/i", \trim($header), $httpResponse) ){
-                $response = $response->withStatus((int) $httpResponse[2], $httpResponse[3] ?? "");
-                $response = $response->withProtocolVersion($httpResponse[1]);
+				$response = $response->withProtocolVersion($httpResponse[1])
+				->withStatus((int) $httpResponse[2], $httpResponse[3]);
             }
-    
+
             elseif( \preg_match("/^([\w\-]+)\: (\N+)\R?+$/", \trim($header), $httpHeader) ){
-                $response = $response->withAddedHeader($httpHeader[1], $httpHeader[2]);
+				$response = $response->withAddedHeader($httpHeader[1], $httpHeader[2]);
             }
         }
-        
+
         return $response;
     }
 
@@ -222,5 +222,5 @@ class StreamContextHandler extends HandlerAbstract
         ]);
 
         echo "{$preamble}\n{$debug}\n";
-    } 
+    }
 }

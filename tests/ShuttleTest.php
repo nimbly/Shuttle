@@ -23,7 +23,7 @@ class ShuttleTest extends TestCase
     {
         $this->assertEquals("Shuttle/1.0", SHUTTLE_USER_AGENT);
     }
-    
+
     public function test_shuttle_creates_default_handler()
     {
         $shuttle = new Shuttle;
@@ -52,7 +52,7 @@ class ShuttleTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals("OK", $response->getBody()->getContents());
         $this->assertTrue($response->hasHeader("Content-Type"));
-        $this->assertEquals("Content-Type: text/plain", $response->getHeaderLine("Content-Type"));
+        $this->assertEquals("text/plain", $response->getHeaderLine("Content-Type"));
     }
 
     public function test_post_response_received()
@@ -68,7 +68,7 @@ class ShuttleTest extends TestCase
         $this->assertEquals(201, $response->getStatusCode());
         $this->assertEquals("OK", $response->getBody()->getContents());
         $this->assertTrue($response->hasHeader("Content-Type"));
-        $this->assertEquals("Content-Type: text/plain", $response->getHeaderLine("Content-Type"));
+        $this->assertEquals("text/plain", $response->getHeaderLine("Content-Type"));
     }
 
     public function test_patch_response_received()
@@ -84,7 +84,7 @@ class ShuttleTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals("OK", $response->getBody()->getContents());
         $this->assertTrue($response->hasHeader("Content-Type"));
-        $this->assertEquals("Content-Type: text/plain", $response->getHeaderLine("Content-Type"));
+        $this->assertEquals("text/plain", $response->getHeaderLine("Content-Type"));
     }
 
     public function test_put_response_received()
@@ -100,7 +100,7 @@ class ShuttleTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals("OK", $response->getBody()->getContents());
         $this->assertTrue($response->hasHeader("Content-Type"));
-        $this->assertEquals("Content-Type: text/plain", $response->getHeaderLine("Content-Type"));
+        $this->assertEquals("text/plain", $response->getHeaderLine("Content-Type"));
     }
 
     public function test_delete_response_received()
@@ -155,7 +155,7 @@ class ShuttleTest extends TestCase
                 },
 
             ]),
-            
+
             'headers' => [
                 'X-Default-Header' => 'Capsule!',
             ]
@@ -204,6 +204,6 @@ class ShuttleTest extends TestCase
         $debug = $reflection->getProperty('debug');
         $debug->setAccessible(true);
 
-        $this->assertTrue($debug->getValue($mockHandler));        
+        $this->assertTrue($debug->getValue($mockHandler));
     }
 }

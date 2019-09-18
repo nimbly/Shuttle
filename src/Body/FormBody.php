@@ -4,11 +4,11 @@ namespace Shuttle\Body;
 
 /**
  * @package Shuttle\Body
- * 
+ *
  * Format a key => value pair array into a Form Urlencoded string.
- * 
+ *
  * Sets Content-Type as "application/x-www-form-urlencoded" by default.
- * 
+ *
  */
 class FormBody extends BufferBody
 {
@@ -25,7 +25,7 @@ class FormBody extends BufferBody
      */
     public function __construct(array $data, string $contentType = null)
     {
-        $this->buffer = http_build_query($data, "n", "&", PHP_QUERY_RFC1738);
+        $this->buffer = \http_build_query($data, "n", "&", PHP_QUERY_RFC1738);
 
         if( $contentType ){
             $this->contentType = $contentType;
@@ -38,7 +38,7 @@ class FormBody extends BufferBody
     public function getMultiPart(string $boundary, ?string $name = null): string
     {
         // Convert the form data back into an array
-        parse_str($this->buffer, $formFields);
+		\parse_str($this->buffer, $formFields);
 
         $multiPart = "";
 

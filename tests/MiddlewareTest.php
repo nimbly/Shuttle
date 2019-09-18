@@ -41,7 +41,7 @@ class MiddlewareTest extends TestCase
             [$shuttle->getHandler(), 'execute']
         ]);
 
-        $response = call_user_func($middleware, new Request);
+        $response = \call_user_func($middleware, new Request("post", "/path"));
 
         $this->assertEquals("Foo", $response->getHeader("X-Middleware")[0]);
     }
