@@ -24,11 +24,7 @@ class JsonBody extends BufferBody
      */
     public function __construct(array $data, string $contentType = null)
     {
-        if( ($json = \json_encode($data)) === false ){
-            throw new \Exception("Invalid JSON");
-        }
-
-        $this->buffer = $json;
+        $this->buffer = (string) \json_encode($data);
 
         if( $contentType ){
             $this->contentType = $contentType;
