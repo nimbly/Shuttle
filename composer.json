@@ -44,6 +44,5 @@
         "psr-4": {
             "Shuttle\\Tests\\": "tests/"
         }
-    },
-    "version": "0.3"
+    }
 }
