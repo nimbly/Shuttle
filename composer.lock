@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "dbb923dcd1d0018e85ef0d8ce1c5196f",
+    "content-hash": "c236998a252daaeef8b164ef8bb7853d",
     "packages": [
         {
             "name": "nimbly/capsule",
-            "version": "0.8.1",
+            "version": "0.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nimbly/Capsule.git",
-                "reference": "a35e4cf72d6bdfd5c76d9b4de7f5af9e6320790f"
+                "reference": "0444b55e613742ac3c8f89744d58f545d6995059"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nimbly/Capsule/zipball/a35e4cf72d6bdfd5c76d9b4de7f5af9e6320790f",
-                "reference": "a35e4cf72d6bdfd5c76d9b4de7f5af9e6320790f",
+                "url": "https://api.github.com/repos/nimbly/Capsule/zipball/0444b55e613742ac3c8f89744d58f545d6995059",
+                "reference": "0444b55e613742ac3c8f89744d58f545d6995059",
                 "shasum": ""
             },
             "require": {
@@ -49,7 +49,7 @@
                 }
             ],
             "description": "PSR-7 implementation",
-            "time": "2019-10-07T21:03:09+00:00"
+            "time": "2019-10-09T14:27:49+00:00"
         },
         {
             "name": "psr/http-client",
@@ -3147,16 +3147,16 @@
         },
         {
             "name": "vimeo/psalm",
-            "version": "3.5.3",
+            "version": "3.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vimeo/psalm.git",
-                "reference": "c3e781c4a06cbb17dc32068eb5d6de075f6babdc"
+                "reference": "7857b07f91bed5afae98574243fed7ec4088d623"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vimeo/psalm/zipball/c3e781c4a06cbb17dc32068eb5d6de075f6babdc",
-                "reference": "c3e781c4a06cbb17dc32068eb5d6de075f6babdc",
+                "url": "https://api.github.com/repos/vimeo/psalm/zipball/7857b07f91bed5afae98574243fed7ec4088d623",
+                "reference": "7857b07f91bed5afae98574243fed7ec4088d623",
                 "shasum": ""
             },
             "require": {
@@ -3231,7 +3231,7 @@
                 "inspection",
                 "php"
             ],
-            "time": "2019-09-27T13:22:06+00:00"
+            "time": "2019-10-11T12:24:35+00:00"
         },
         {
             "name": "webmozart/assert",

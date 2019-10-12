@@ -120,7 +120,7 @@ class CurlHandlerTest extends TestCase
         $reflection = new \ReflectionClass($curlHandler);
 
         $request = new Request("get", "http://example.com");
-        $request = $request->withProtocolVersion(1);
+        $request = $request->withProtocolVersion("1");
 
         $method = $reflection->getMethod('buildRequestHttpProtocolVersion');
         $method->setAccessible(true);
@@ -138,7 +138,7 @@ class CurlHandlerTest extends TestCase
         $reflection = new \ReflectionClass($curlHandler);
 
         $request = new Request("get", "http://example.com");
-        $request = $request->withProtocolVersion(1.1);
+        $request = $request->withProtocolVersion("1.1");
 
         $method = $reflection->getMethod('buildRequestHttpProtocolVersion');
         $method->setAccessible(true);
@@ -156,7 +156,7 @@ class CurlHandlerTest extends TestCase
         $reflection = new \ReflectionClass($curlHandler);
 
         $request = new Request("get", "http://example.com");
-        $request = $request->withProtocolVersion(2);
+        $request = $request->withProtocolVersion("2");
 
         $method = $reflection->getMethod('buildRequestHttpProtocolVersion');
         $method->setAccessible(true);
