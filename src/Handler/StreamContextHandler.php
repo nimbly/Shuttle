@@ -157,70 +157,67 @@ class StreamContextHandler extends HandlerAbstract
      *
      * @param int $notification_code
      * @param int $severity
-     * @param string $message
+     * @param string|null $message
      * @param int $message_code
      * @param int $bytes_transferred
      * @param int $bytes_max
      * @return void
      */
-    private function debug(int $notification_code, int $severity, string $message, int $message_code, int $bytes_transferred, int $bytes_max): void
+    private function debug(int $notification_code, int $severity, ?string $message, int $message_code, int $bytes_transferred, int $bytes_max): void
     {
         switch( $notification_code ){
 
             case STREAM_NOTIFY_CONNECT:
-                $debug = "Connected";
+                $notification = "CONNECTED";
                 break;
 
             case STREAM_NOTIFY_RESOLVE:
-                $debug = "Resolve: {$message}";
+                $notification = "RESOLVED";
                 break;
 
             case STREAM_NOTIFY_AUTH_REQUIRED:
-                $debug = "Auth required: {$message}";
+                $notification = "AUTH REQUIRED";
                 break;
 
             case STREAM_NOTIFY_COMPLETED:
-                $debug = "Completed: {$message}";
+                $notification = "COMPLETED";
                 break;
 
             case STREAM_NOTIFY_FAILURE:
-                $debug = "Failure: {$message}";
+                $notification = "FAILURE";
                 break;
 
             case STREAM_NOTIFY_AUTH_RESULT:
-                $debug = "Auth result: {$message}";
+                $notification = "AUTH RESULT";
                 break;
 
             case STREAM_NOTIFY_REDIRECTED:
-                $debug = "Redirect: {$message}";
+                $notification = "REDIRECT";
                 break;
 
-
             case STREAM_NOTIFY_FILE_SIZE_IS:
-                $debug = "Content size: {$bytes_max}";
+                $notification = "FILE SIZE";
                 break;
 
             case STREAM_NOTIFY_MIME_TYPE_IS:
-                $debug = "Content mime-type: {$message}";
+                $notification = "MIME TYPE";
                 break;
 
             case STREAM_NOTIFY_PROGRESS:
-                $debug = "Transfered: {$bytes_transferred}";
+                $notification = "PROGRESS";
                 break;
 
             default:
-                $debug = "Foo";
+                $notification = "UNKNOWN";
         }
 
-        $preamble = \json_encode([
-            "noitification_code" => $notification_code,
-            "severity" => $severity,
-            "message" => $message,
-            "message_code" => $message_code,
-            "bytes_transferred" => $bytes_transferred,
-            "bytes_max" => $bytes_max,
-        ]);
-
-        echo "{$preamble}\n{$debug}\n";
+		echo
+			"************\n" .
+            "Notification: {$notification}\n" .
+            "Severity: {$severity}\n" .
+            "Message: " . \trim($message ?? "") . "\n" .
+            //"Message code: {$message_code}\n" .
+			"Bytes Transfered: {$bytes_transferred}\n" .
+			"************\n\n";
     }
 }
