@@ -64,7 +64,7 @@ class StreamContextHandler extends HandlerAbstract
      * Build the HTTP context options.
      *
      * @param RequestInterface $request
-     * @return array<string, string>
+     * @return array<string, mixed>
      */
     private function buildHttpContext(RequestInterface $request): array
     {

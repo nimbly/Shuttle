@@ -8,7 +8,6 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Shuttle\RequestException;
-use Shuttle\Shuttle;
 
 class CurlHandler extends HandlerAbstract
 {

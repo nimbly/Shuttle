@@ -5,7 +5,6 @@ namespace Shuttle;
 \define("SHUTTLE_USER_AGENT", "Shuttle/1.0");
 
 use Capsule\Request;
-use Capsule\Uri;
 use Closure;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
