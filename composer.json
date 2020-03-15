@@ -14,7 +14,7 @@
 		"php": ">=7.2",
 		"ext-json": "*",
         "psr/http-client": "^1.0",
-        "nimbly/capsule": "^0.11"
+        "nimbly/capsule": "^1.0"
     },
     "require-dev": {
         "vimeo/psalm": "^3.0",

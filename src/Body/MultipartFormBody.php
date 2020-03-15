@@ -37,6 +37,7 @@ class MultipartFormBody extends BufferStream implements BodyInterface
          */
         foreach( $parts as $name => $part ){
 
+			/** @psalm-suppress DocblockTypeContradiction */
             if( !\is_string($name) ){
                 throw new \Exception('Please provide a name for each part of a Multipart request.');
             }

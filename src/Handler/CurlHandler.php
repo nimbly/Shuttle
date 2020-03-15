@@ -3,7 +3,7 @@
 namespace Shuttle\Handler;
 
 use Capsule\Response;
-use Capsule\Stream\FileStream;
+use Capsule\Stream\ResourceStream;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
@@ -27,7 +27,6 @@ class CurlHandler extends HandlerAbstract
      * @var array
      */
     private $options = [
-
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_MAXREDIRS => 10,
         CURLOPT_HEADER => false,
@@ -36,8 +35,7 @@ class CurlHandler extends HandlerAbstract
         CURLOPT_SSL_VERIFYPEER => true,
         CURLOPT_SSL_VERIFYHOST => 2,
         CURLOPT_PROTOCOLS => CURLPROTO_HTTP | CURLPROTO_HTTPS,
-        CURLOPT_VERBOSE => false,
-
+        CURLOPT_VERBOSE => false
     ];
 
     /**
@@ -119,7 +117,7 @@ class CurlHandler extends HandlerAbstract
      */
     private function makeResponseBodyStream(): StreamInterface
     {
-        return new FileStream(
+        return new ResourceStream(
             \fopen("php://temp/maxmemory:{$this->maxResponseBodyMemory}", "w+")
         );
     }
@@ -139,13 +137,16 @@ class CurlHandler extends HandlerAbstract
             CURLOPT_CUSTOMREQUEST => $request->getMethod(),
             CURLOPT_PORT => $request->getUri()->getPort(),
             CURLOPT_URL => (string) $request->getUri(),
-            CURLOPT_HTTPHEADER => $this->buildRequestHeaders($request),
+			CURLOPT_HTTPHEADER => $this->buildRequestHeaders($request),
+
+			/** @psalm-suppress MissingClosureParamType */
             CURLOPT_WRITEFUNCTION => function($handler, string $data) use (&$response): int {
 
                 return $response->getBody()->write($data);
 
             },
 
+			/** @psalm-suppress MissingClosureParamType */
             CURLOPT_HEADERFUNCTION => function($handler, string $header) use (&$response): int {
 
                 if( \preg_match("/^HTTP\/([\d\.]+) ([\d]{3})(?: ([\w\h]+))?\R?+$/i", \trim($header), $httpResponse) ){

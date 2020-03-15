@@ -7,10 +7,7 @@ use Capsule\Stream\BufferStream;
 use PHPUnit\Framework\TestCase;
 
 /**
- * 
  * @covers Shuttle\Body\FileUploadBody
- * @covers Capsule\Stream\FileStream
- * 
  */
 class FileUploadBodyTest extends TestCase
 {

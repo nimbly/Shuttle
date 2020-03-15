@@ -38,7 +38,7 @@ class FormBody extends BufferBody
     public function getMultiPart(string $boundary, ?string $name = null): string
     {
         // Convert the form data back into an array
-		\parse_str($this->buffer, $formFields);
+		\parse_str($this->buffer ?? "", $formFields);
 
         $multiPart = "";
 

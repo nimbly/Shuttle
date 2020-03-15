@@ -2,7 +2,7 @@
 
 namespace Shuttle\Body;
 
-use Capsule\Stream\FileStream;
+use Capsule\Stream\ResourceStream;
 use Psr\Http\Message\StreamInterface;
 
 /**
@@ -44,7 +44,7 @@ class FileUploadBody extends BufferBody
     public function __construct($file, ?string $fileName = null, string $contentType = null)
     {
         if( ($file instanceof StreamInterface) === false ){
-            $this->stream = new FileStream(
+            $this->stream = new ResourceStream(
                 \fopen($file, "r")
             );
 

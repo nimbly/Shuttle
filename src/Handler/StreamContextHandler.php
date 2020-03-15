@@ -3,7 +3,7 @@
 namespace Shuttle\Handler;
 
 use Capsule\Response;
-use Capsule\Stream\FileStream;
+use Capsule\Stream\ResourceStream;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
@@ -121,7 +121,7 @@ class StreamContextHandler extends HandlerAbstract
 
         }
 
-        return new FileStream($stream);
+        return new ResourceStream($stream);
     }
 
     /**
