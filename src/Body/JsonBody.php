@@ -11,23 +11,23 @@ namespace Shuttle\Body;
  */
 class JsonBody extends BufferBody
 {
-    /**
-     * @inheritDoc
-     */
-    protected $contentType = "application/json";
+	/**
+	 * @inheritDoc
+	 */
+	protected $contentType = "application/json";
 
-    /**
-     * JsonBody constructor.
-     *
-     * @param array $data
-     * @param string|null $contentType
-     */
-    public function __construct(array $data, string $contentType = null)
-    {
-        $this->buffer = (string) \json_encode($data);
+	/**
+	 * JsonBody constructor.
+	 *
+	 * @param array $data
+	 * @param string|null $contentType
+	 */
+	public function __construct(array $data, string $contentType = null)
+	{
+		$this->buffer = (string) \json_encode($data);
 
-        if( $contentType ){
-            $this->contentType = $contentType;
-        }
-    }
+		if( $contentType ){
+			$this->contentType = $contentType;
+		}
+	}
 }

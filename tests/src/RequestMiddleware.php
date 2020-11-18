@@ -8,11 +8,11 @@ use Shuttle\MiddlewareInterface;
 
 class RequestMiddleware implements MiddlewareInterface
 {
-    public function process(RequestInterface $request, callable $next): ResponseInterface
-    {
-        $response = $next($request);
-        $response = $response->withAddedHeader("X-Middleware", "Foo");
+	public function process(RequestInterface $request, callable $next): ResponseInterface
+	{
+		$response = $next($request);
+		$response = $response->withAddedHeader("X-Middleware", "Foo");
 
-        return $response;
-    }
+		return $response;
+	}
 }

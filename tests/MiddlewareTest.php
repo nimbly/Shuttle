@@ -16,33 +16,33 @@ use Shuttle\Tests\src\RequestMiddleware;
  */
 class MiddlewareTest extends TestCase
 {
-    public function test_middleware_compiles()
-    {
-        $shuttle = new Shuttle([
-            'handler' => new MockHandler([
-                new Response(200, "OK"),
-            ]),
+	public function test_middleware_compiles()
+	{
+		$shuttle = new Shuttle([
+			'handler' => new MockHandler([
+				new Response(200, "OK"),
+			]),
 
-            'middleware' => [
-                new RequestMiddleware
-            ]
-        ]);
+			'middleware' => [
+				new RequestMiddleware
+			]
+		]);
 
-        $reflection = new ReflectionClass($shuttle);
-        $property = $reflection->getProperty('options');
-        $property->setAccessible(true);
-        $options = $property->getValue($shuttle);
+		$reflection = new ReflectionClass($shuttle);
+		$property = $reflection->getProperty('options');
+		$property->setAccessible(true);
+		$options = $property->getValue($shuttle);
 
-        $method = $reflection->getMethod('compileMiddleware');
-        $method->setAccessible(true);
+		$method = $reflection->getMethod('compileMiddleware');
+		$method->setAccessible(true);
 
-        $middleware = $method->invokeArgs($shuttle, [
-            $options['middleware'],
-            [$shuttle->getHandler(), 'execute']
-        ]);
+		$middleware = $method->invokeArgs($shuttle, [
+			$options['middleware'],
+			[$shuttle->getHandler(), 'execute']
+		]);
 
-        $response = \call_user_func($middleware, new Request("post", "/path"));
+		$response = \call_user_func($middleware, new Request("post", "/path"));
 
-        $this->assertEquals("Foo", $response->getHeader("X-Middleware")[0]);
-    }
+		$this->assertEquals("Foo", $response->getHeader("X-Middleware")[0]);
+	}
 }

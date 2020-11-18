@@ -12,42 +12,42 @@ namespace Shuttle\Body;
  */
 class FormBody extends BufferBody
 {
-    /**
-     * @inheritDoc
-     */
-    protected $contentType = "application/x-www-form-urlencoded";
+	/**
+	 * @inheritDoc
+	 */
+	protected $contentType = "application/x-www-form-urlencoded";
 
-    /**
-     * FormBody constructor.
-     *
-     * @param array $data
-     * @param string|null $contentType
-     */
-    public function __construct(array $data, string $contentType = null)
-    {
-        $this->buffer = \http_build_query($data, "n", "&", PHP_QUERY_RFC1738);
+	/**
+	 * FormBody constructor.
+	 *
+	 * @param array $data
+	 * @param string|null $contentType
+	 */
+	public function __construct(array $data, string $contentType = null)
+	{
+		$this->buffer = \http_build_query($data, "n", "&", PHP_QUERY_RFC1738);
 
-        if( $contentType ){
-            $this->contentType = $contentType;
-        }
-    }
+		if( $contentType ){
+			$this->contentType = $contentType;
+		}
+	}
 
-    /**
-     * @inheritDoc
-     */
-    public function getMultiPart(string $boundary, ?string $name = null): string
-    {
-        // Convert the form data back into an array
+	/**
+	 * @inheritDoc
+	 */
+	public function getMultiPart(string $boundary, ?string $name = null): string
+	{
+		// Convert the form data back into an array
 		\parse_str($this->buffer ?? "", $formFields);
 
-        $multiPart = "";
+		$multiPart = "";
 
-        foreach( $formFields as $name => $value ){
-            $multiPart .= "\r\n--{$boundary}\r\n";
-            $multiPart .= 'Content-Disposition: form-data; name="' . $name . '"' . "\r\n\r\n";
-            $multiPart .= $value;
-        }
+		foreach( $formFields as $name => $value ){
+			$multiPart .= "\r\n--{$boundary}\r\n";
+			$multiPart .= 'Content-Disposition: form-data; name="' . $name . '"' . "\r\n\r\n";
+			$multiPart .= $value;
+		}
 
-        return $multiPart;
-    }
+		return $multiPart;
+	}
 }
