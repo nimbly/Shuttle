@@ -10,6 +10,7 @@ use Shuttle\Handler\MockHandler;
 
 /**
  * @covers Shuttle\Handler\MockHandler
+ * @covers Shuttle\Handler\HandlerAbstract
  */
 class MockHandlerTest extends TestCase
 {

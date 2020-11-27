@@ -2,8 +2,6 @@
 
 namespace Shuttle;
 
-\define("SHUTTLE_USER_AGENT", "Shuttle/1.0");
-
 use Capsule\Request;
 use Closure;
 use Psr\Http\Client\ClientInterface;
@@ -17,6 +15,8 @@ use Shuttle\Handler\HandlerAbstract;
 
 class Shuttle implements ClientInterface
 {
+	const SHUTTLE_USER_AGENT = "Shuttle/1.0";
+
 	/**
 	 * Shuttle specific options.
 	 *
@@ -179,7 +179,7 @@ class Shuttle implements ClientInterface
 
 		// Add in default User-Agent header if none was provided.
 		if( $request->hasHeader('User-Agent') === false ){
-			$request = $request->withHeader('User-Agent', SHUTTLE_USER_AGENT . ' PHP/' . PHP_VERSION);
+			$request = $request->withHeader('User-Agent', self::SHUTTLE_USER_AGENT . ' PHP/' . PHP_VERSION);
 		}
 
 		return $request;

@@ -13,6 +13,7 @@ use Shuttle\Tests\src\RequestMiddleware;
 /**
  * @covers Shuttle\Shuttle
  * @covers Shuttle\Handler\MockHandler
+ * @covers Shuttle\Handler\HandlerAbstract
  */
 class MiddlewareTest extends TestCase
 {

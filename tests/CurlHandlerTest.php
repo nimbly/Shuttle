@@ -10,6 +10,7 @@ use Capsule\Stream\BufferStream;
 
 /**
  * @covers Shuttle\Handler\CurlHandler
+ * @covers Shuttle\Handler\HandlerAbstract
  */
 class CurlHandlerTest extends TestCase
 {

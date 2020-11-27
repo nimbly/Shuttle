@@ -11,14 +11,14 @@
         "psr-18"
     ],
     "require": {
-		"php": ">=7.2",
+		"php": ">=7.2|^8",
 		"ext-json": "*",
         "psr/http-client": "^1.0",
         "nimbly/capsule": "^1.0"
     },
     "require-dev": {
-        "vimeo/psalm": "^3.0",
-        "phpunit/phpunit": "^8.0",
+        "vimeo/psalm": "^4.0",
+        "phpunit/phpunit": "^9.0",
         "php-coveralls/php-coveralls": "^2.1",
         "symfony/var-dumper": "^4.2"
     },
