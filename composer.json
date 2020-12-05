@@ -11,7 +11,7 @@
         "psr-18"
     ],
     "require": {
-		"php": ">=7.4|^8",
+		"php": "^7.4|^8.0",
 		"ext-json": "*",
         "psr/http-client": "^1.0",
         "nimbly/capsule": "^1.0"
