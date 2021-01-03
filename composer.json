@@ -9,30 +9,21 @@
         "curl",
         "stream context",
         "psr-18"
-    ],
-    "require": {
-		"php": "^7.4|^8.0",
-		"ext-json": "*",
-        "psr/http-client": "^1.0",
-        "nimbly/capsule": "^1.0"
-    },
-    "require-dev": {
-        "vimeo/psalm": "^4.0",
-        "phpunit/phpunit": "^9.0",
-        "php-coveralls/php-coveralls": "^2.1",
-        "symfony/var-dumper": "^4.2"
-    },
-    "suggest": {
-        "ext-curl": "Use cURL library to make HTTP calls."
-    },
-    "license": "MIT",
+	],
+	"license": "MIT",
     "authors": [
         {
             "name": "Brent Scheffler",
             "email": "brent@nimbly.io"
         }
     ],
-    "autoload": {
+    "require": {
+		"php": ">=7.3|^8.0",
+		"ext-json": "*",
+        "psr/http-client": "^1.0",
+        "nimbly/capsule": "^1.0"
+	},
+	"autoload": {
         "psr-4": {
             "Shuttle\\": "src/"
         },
@@ -40,9 +31,18 @@
             "src/functions.php"
         ]
     },
-    "autoload-dev": {
+    "require-dev": {
+        "vimeo/psalm": "^4.0",
+        "phpunit/phpunit": "^9.0",
+        "php-coveralls/php-coveralls": "^2.1",
+        "symfony/var-dumper": "^4.2"
+	},
+	"autoload-dev": {
         "psr-4": {
             "Shuttle\\Tests\\": "tests/"
         }
+    },
+    "suggest": {
+        "ext-curl": "Use cURL library to make HTTP calls."
     }
 }
