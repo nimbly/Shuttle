@@ -18,7 +18,7 @@
         }
     ],
     "require": {
-		"php": ">=7.3|^8.0",
+		"php": "^7.3|^8.0",
 		"ext-json": "*",
         "psr/http-client": "^1.0",
         "nimbly/capsule": "^1.0"
@@ -26,10 +26,7 @@
 	"autoload": {
         "psr-4": {
             "Shuttle\\": "src/"
-        },
-        "files": [
-            "src/functions.php"
-        ]
+        }
     },
     "require-dev": {
         "vimeo/psalm": "^4.0",
@@ -40,7 +37,10 @@
 	"autoload-dev": {
         "psr-4": {
             "Shuttle\\Tests\\": "tests/"
-        }
+        },
+        "files": [
+            "src/functions.php"
+        ]
     },
     "suggest": {
         "ext-curl": "Use cURL library to make HTTP calls."
