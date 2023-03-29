@@ -1,6 +1,6 @@
 <?php
 
-namespace Shuttle\Body;
+namespace Nimbly\Shuttle\Body;
 
 interface PartInterface
 {

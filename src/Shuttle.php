@@ -1,113 +1,92 @@
-<?php declare(strict_types=1);
+<?php
 
-namespace Shuttle;
+namespace Nimbly\Shuttle;
 
-use Capsule\Request;
 use Closure;
+use Nimbly\Capsule\Factory\RequestFactory;
+use Nimbly\Capsule\Factory\ResponseFactory;
+use Nimbly\Capsule\Factory\StreamFactory;
+use Nimbly\Capsule\Factory\UriFactory;
+use Nimbly\Shuttle\Body\BodyInterface;
+use Nimbly\Shuttle\Handler\CurlHandler;
+use Nimbly\Shuttle\Handler\HandlerInterface;
 use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
+use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\UriInterface;
-use Shuttle\Body\BodyInterface;
-use Shuttle\Handler\CurlHandler;
-use Shuttle\Handler\HandlerAbstract;
 
 class Shuttle implements ClientInterface
 {
-	const SHUTTLE_USER_AGENT = "Shuttle/1.0";
+	const SHUTTLE_USER_AGENT = "Shuttle/2.0";
+
+	protected HandlerInterface $handler;
+	protected RequestFactoryInterface $requestFactory;
+	protected ResponseFactoryInterface $responseFactory;
+	protected StreamFactoryInterface $streamFactory;
+	protected UriFactoryInterface $uriFactory;
+	protected Closure $middleware;
 
 	/**
-	 * Shuttle specific options.
-	 *
-	 * @var array
+	 * @param HandlerInterface|null $handler
+	 * @param string|null $base_url
+	 * @param array<string,string> $headers
+	 * @param array<MiddlewareInterface> $middleware
+	 * @param string $http_version
+	 * @param RequestFactoryInterface|null $requestFactory
+	 * @param ResponseFactoryInterface|null $responseFactory
+	 * @param StreamFactoryInterface|null $streamFactory
+	 * @param UriFactoryInterface|null $uriFactory
 	 */
-	private $options = [
-
-		/**
-		 * Handler to use for calls.
-		 *
-		 * Defaults to CurlHandler.
-		 */
-		"handler" => null,
-
-		/**
-		 * HTTP protocol version to use for calls.
-		 *
-		 * Defaults to "1.1".
-		 */
-		"http_version" => "1.1",
-
-		/**
-		 * Base URL to prepend to request calls. This base URL is only prepended
-		 * when using the "request" method (or any of the built-in HTTP method
-		 * calls: get, post, put, etc.).
-		 *
-		 * Defaults to null.
-		 */
-		"base_url" => null,
-
-		/**
-		 * Set of key => value pairs to include as default headers with
-		 * request calls. Headers are only added when using the "request"
-		 * method (or any of the built-in HTTP method calls: get, post, put, etc.).
-		 *
-		 * Defaults to empty array.
-		 */
-		"headers" => [],
-
-		/**
-		 * Middleware instances to run in the middleware pipeline. Each element
-		 * should be an instance of Shuttle\MiddlewareInterface. Middleware
-		 * are executed in the order provided in the array.
-		 *
-		 * Defaults to empty array.
-		 */
-		"middleware" => [],
-
-		/**
-		 * Enable or disable debug mode.
-		 * Debug mode will print verbose connection, request, and response data to STDOUT.
-		 *
-		 * Defaults to false.
-		 */
-		"debug" => false,
-	];
-
-	/**
-	 * Compiled Middleware chain
-	 *
-	 * @var Closure
-	 */
-	private $middlewareChain;
-
-	/**
-	 * Shuttle constructor.
-	 *
-	 * @param array $options
-	 */
-	public function __construct(array $options = [])
+	public function __construct(
+		?HandlerInterface $handler = null,
+		protected ?string $base_url = null,
+		protected array $headers = [],
+		array $middleware = [],
+		protected string $http_version = "1.1",
+		?RequestFactoryInterface $requestFactory = null,
+		?ResponseFactoryInterface $responseFactory = null,
+		?StreamFactoryInterface $streamFactory = null,
+		?UriFactoryInterface $uriFactory = null,
+	)
 	{
-		// Merge in user supplied options.
-		$this->options = \array_merge($this->options, $options);
-
-		// Create default HTTP handler (CurlHandler) if none was provided.
-		$this->options['handler'] = $this->options["handler"] ?? new CurlHandler;
-
-		// Make sure handler is really a Handler.
-		if( ($this->options['handler'] instanceof HandlerAbstract) === false ){
-			throw new \Exception("Handler option must be an instance of HandlerAbstract.");
+		if( empty($handler) ){
+			$handler = new CurlHandler;
 		}
 
-		// Enable debug mode on handler.
-		if( $this->options['debug'] ){
-			$this->getHandler()->setDebug($this->options['debug'] === true);
+		if( empty($requestFactory) ){
+			$requestFactory = new RequestFactory;
 		}
 
-		// Build the middleware chain.
-		$this->middlewareChain = $this->compileMiddleware(
-			$this->options['middleware'] ?? [],
-			[$this->getHandler(), 'execute']
+		if( empty($responseFactory) ){
+			$responseFactory = new ResponseFactory;
+		}
+
+		if( empty($streamFactory) ){
+			$streamFactory = new StreamFactory;
+		}
+
+		if( empty($uriFactory) ){
+			$uriFactory = new UriFactory;
+		}
+
+		$this->handler = $handler;
+		$this->requestFactory = $requestFactory;
+		$this->responseFactory = $responseFactory;
+		$this->uriFactory = $uriFactory;
+		$this->streamFactory = $streamFactory;
+		$this->middleware = $this->compileMiddleware(
+			$middleware,
+			function(RequestInterface $request): ResponseInterface {
+				return $this->handler->execute(
+					$request,
+					$this->responseFactory->createResponse(200)
+				);
+			}
 		);
 	}
 
@@ -124,62 +103,79 @@ class Shuttle implements ClientInterface
 		$layers = \array_reverse($layers);
 
 		// Create a single chained Lamda with all the Middleware layers being passed on to the next.
-		return \array_reduce($layers, function(Closure $next, MiddlewareInterface $middleware): Closure {
-
-			return function(RequestInterface $request) use ($next, $middleware): ResponseInterface {
-				return $middleware->process($request, $next);
-			};
-
-		}, function(RequestInterface $request) use ($kernel): ResponseInterface {
-			return \call_user_func($kernel, $request);
-		});
+		return \array_reduce(
+			$layers,
+			function(callable $next, MiddlewareInterface $middleware): Closure {
+				return function(RequestInterface $request) use ($next, $middleware): ResponseInterface {
+					return $middleware->process($request, $next);
+				};
+			},
+			function(RequestInterface $request) use ($kernel): ResponseInterface {
+				return \call_user_func($kernel, $request);
+			}
+		);
 	}
 
 	/**
 	 * Get the HTTP handler.
 	 *
-	 * @return HandlerAbstract
+	 * @return HandlerInterface
 	 */
-	public function getHandler(): HandlerAbstract
+	public function getHandler(): HandlerInterface
 	{
-		return $this->options['handler'];
+		return $this->handler;
 	}
 
 	/**
 	 * Make a Request instance.
 	 *
 	 * @param string $method
-	 * @param UriInterface|string $uri
-	 * @param StreamInterface $body
-	 * @param array<string, mixed>	 $options
+	 * @param string|UriInterface $uri
+	 * @param string|StreamInterface|null $body
+	 * @param array<string,string> $headers
+	 * @param string $http_version
 	 * @return RequestInterface
 	 */
-	public function makeRequest(string $method, $uri, StreamInterface $body = null, array $options = []): RequestInterface
+	public function makeRequest(
+		string $method,
+		string|UriInterface $uri,
+		string|StreamInterface|null $body = null,
+		array $headers = [],
+		string $http_version = "1.1"): RequestInterface
 	{
 		// Create a new Request
-		$request = new Request(
+		$request = $this->requestFactory->createRequest(
 			$method,
-			\is_string($uri) ? ($this->options['base_url'] ?? "" . $uri) : $uri,
-			$body,
-			\array_merge($this->options['headers'] ?? [], $options['headers'] ?? []),
-			$options['http_version'] ?? $this->options['http_version'] ?? '1.1'
+			\is_string($uri) ? $this->uriFactory->createUri(($this->base_url ?? "") . $uri) : $uri
 		);
 
+		$request = $request->withProtocolVersion($http_version);
+
+		if( $body instanceof StreamInterface ){
+			$request = $request->withBody($body);
+		}
+		else {
+			$request = $request->withBody($this->streamFactory->createStream((string) $body));
+		}
+
+		foreach( \array_merge($this->headers, $headers) as $name => $value ){
+			$request = $request->withAddedHeader($name, $value);
+		}
+
 		// Add Content-Type header
-		if( $body ){
-			if( $body instanceof BodyInterface &&
-				$request->hasHeader('Content-Type') === false ){
+		if( $request->getBody()->getSize() ){
+			if( $body instanceof BodyInterface && $request->hasHeader("Content-Type") === false ){
 				$request = $request->withHeader("Content-Type", $body->getContentType());
 			}
 
-			if( $request->hasHeader('Content-Length') === false ){
-				$request = $request->withHeader("Content-Length", (string) $body->getSize());
+			if( $request->hasHeader("Content-Length") === false ){
+				$request = $request->withHeader("Content-Length", (string) $request->getBody()->getSize());
 			}
 		}
 
 		// Add in default User-Agent header if none was provided.
-		if( $request->hasHeader('User-Agent') === false ){
-			$request = $request->withHeader('User-Agent', self::SHUTTLE_USER_AGENT . ' PHP/' . PHP_VERSION);
+		if( $request->hasHeader("User-Agent") === false ){
+			$request = $request->withHeader("User-Agent", self::SHUTTLE_USER_AGENT . " PHP/" . PHP_VERSION);
 		}
 
 		return $request;
@@ -195,23 +191,38 @@ class Shuttle implements ClientInterface
 		 * Send the request through the Middleware chain.
 		 *
 		 */
-		return \call_user_func($this->middlewareChain, $request);
+		return \call_user_func(
+			$this->middleware,
+			$request
+		);
 	}
 
 	/**
 	 * Make a request.
 	 *
 	 * @param string $method
-	 * @param UriInterface|string $uri
-	 * @param StreamInterface $body
-	 * @param array<string, mixed> $options
+	 * @param string|UriInterface $uri
+	 * @param string|StreamInterface|null $body
+	 * @param array<array-key,string> $headers
+	 * @param string $http_version
 	 * @throws RequestException
 	 * @return ResponseInterface
 	 */
-	public function request(string $method, $uri, StreamInterface $body = null, array $options = []): ResponseInterface
+	public function request(
+		string $method,
+		string|UriInterface $uri,
+		string|StreamInterface|null $body = null,
+		array $headers = [],
+		string $http_version = "1.1"): ResponseInterface
 	{
 		return $this->sendRequest(
-			$this->makeRequest($method, $uri, $body, $options)
+			$this->makeRequest(
+				$method,
+				$uri,
+				$body,
+				$headers,
+				$http_version
+			)
 		);
 	}
 
@@ -219,12 +230,12 @@ class Shuttle implements ClientInterface
 	 * Make a GET call.
 	 *
 	 * @param string $path
-	 * @param array<string, mixed> $options
+	 * @param array<array-key,mixed> $headers
 	 * @return ResponseInterface
 	 */
-	public function get(string $path, array $options = []): ResponseInterface
+	public function get(string $path, array $headers = []): ResponseInterface
 	{
-		return $this->request("get", $path, null, $options);
+		return $this->request("get", $path, null, $headers);
 	}
 
 	/**
@@ -232,12 +243,12 @@ class Shuttle implements ClientInterface
 	 *
 	 * @param string $path
 	 * @param StreamInterface $body
-	 * @param array<string, mixed> $options
+	 * @param array<array-key,mixed> $headers
 	 * @return ResponseInterface
 	 */
-	public function post(string $path, StreamInterface $body, array $options = []): ResponseInterface
+	public function post(string $path, StreamInterface $body, array $headers = []): ResponseInterface
 	{
-		return $this->request("post", $path, $body, $options);
+		return $this->request("post", $path, $body, $headers);
 	}
 
 	/**
@@ -245,12 +256,12 @@ class Shuttle implements ClientInterface
 	 *
 	 * @param string $path
 	 * @param StreamInterface $body
-	 * @param array<string, mixed> $options
+	 * @param array<array-key,mixed> $headers
 	 * @return ResponseInterface
 	 */
-	public function put(string $path, StreamInterface $body, array $options = []): ResponseInterface
+	public function put(string $path, StreamInterface $body, array $headers = []): ResponseInterface
 	{
-		return $this->request("put", $path, $body, $options);
+		return $this->request("put", $path, $body, $headers);
 	}
 
 	/**
@@ -258,47 +269,47 @@ class Shuttle implements ClientInterface
 	 *
 	 * @param string $path
 	 * @param StreamInterface $body
-	 * @param array<string, mixed> $options
+	 * @param array<array-key,mixed> $headers
 	 * @return ResponseInterface
 	 */
-	public function patch(string $path, StreamInterface $body, array $options = []): ResponseInterface
+	public function patch(string $path, StreamInterface $body, array $headers = []): ResponseInterface
 	{
-		return $this->request("patch", $path, $body, $options);
+		return $this->request("patch", $path, $body, $headers);
 	}
 
 	/**
 	 * Make a DELETE call.
 	 *
 	 * @param string $path
-	 * @param array<string, mixed> $options
+	 * @param array<array-key,mixed> $headers
 	 * @return ResponseInterface
 	 */
-	public function delete(string $path, array $options = []): ResponseInterface
+	public function delete(string $path, array $headers = []): ResponseInterface
 	{
-		return $this->request("delete", $path, null, $options);
+		return $this->request("delete", $path, null, $headers);
 	}
 
 	/**
 	 * Make a HEAD call.
 	 *
 	 * @param string $path
-	 * @param array<string, mixed> $options
+	 * @param array<array-key,mixed> $headers
 	 * @return ResponseInterface
 	 */
-	public function head(string $path, array $options = []): ResponseInterface
+	public function head(string $path, array $headers = []): ResponseInterface
 	{
-		return $this->request("head", $path, null, $options);
+		return $this->request("head", $path, null, $headers);
 	}
 
 	/**
 	 * Make an OPTIONS call.
 	 *
 	 * @param string $path
-	 * @param array<string, mixed> $options
+	 * @param array<array-key,mixed> $headers
 	 * @return ResponseInterface
 	 */
-	public function options(string $path, array $options = []): ResponseInterface
+	public function options(string $path, array $headers = []): ResponseInterface
 	{
-		return $this->request("options", $path, null, $options);
+		return $this->request("options", $path, null, $headers);
 	}
 }

@@ -1,10 +1,8 @@
-<?php declare(strict_types=1);
+<?php
 
-namespace Shuttle\Body;
+namespace Nimbly\Shuttle\Body;
 
 /**
- * @package Shuttle\Body
- *
  * Passes raw XML data through.
  *
  * Sets the Content-Type as "application/xml" by default.
@@ -14,20 +12,18 @@ class XmlBody extends BufferBody
 	/**
 	 * @inheritDoc
 	 */
-	protected $contentType = "application/xml";
+	protected string $content_type = "application/xml";
 
 	/**
-	 * XmlBody constructor.
-	 *
 	 * @param string $data
-	 * @param string|null $contentType
+	 * @param string|null $content_type
 	 */
-	public function __construct(string $data = "", string $contentType = null)
+	public function __construct(string $data = "", ?string $content_type = null)
 	{
 		$this->buffer = $data;
 
-		if( $contentType ){
-			$this->contentType = $contentType;
+		if( $content_type ){
+			$this->content_type = $content_type;
 		}
 	}
 }

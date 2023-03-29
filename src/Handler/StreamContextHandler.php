@@ -1,92 +1,97 @@
-<?php declare(strict_types=1);
+<?php
 
-namespace Shuttle\Handler;
+namespace Nimbly\Shuttle\Handler;
 
-use Capsule\Response;
-use Capsule\Stream\ResourceStream;
+use Nimbly\Shuttle\HandlerException;
+use Nimbly\Shuttle\RawResponseTrait;
+use Nimbly\Shuttle\RequestException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\StreamInterface;
-use Shuttle\RequestException;
 
-class StreamContextHandler extends HandlerAbstract
+class StreamContextHandler implements HandlerInterface
 {
+	use RawResponseTrait;
+
 	/**
 	 * Default stream handler options.
 	 *
-	 * @var array
+	 * @var array{follow_location:int,ignore_errors:bool,request_fulluri:bool,max_redirects:int,timeout:int}
 	 */
-	protected $options = [
-		'follow_location' => 1,
-		'request_fulluri' => false,
-		'max_redirects' => 10,
-		'ignore_errors' => true,
-		'timeout' => 120,
+	protected array $options = [
+		"follow_location" => 0,
+		"ignore_errors" => true,
+		"request_fulluri" => false,
+		"max_redirects" => 10,
+		"timeout" => 120,
 	];
 
 	/**
-	 * Debug mode flag.
-	 *
-	 * @var boolean
+	 * @param array<string,mixed> $options Array of HTTP stream context key => value pairs. See http://php.net/manual/en/context.http.php for list of available options.
 	 */
-	protected $debug = false;
-
-	/**
-	 * StreamContextHandler constructor.
-	 *
-	 * @param array $options Array of HTTP stream context key => value pairs. See http://php.net/manual/en/context.http.php for list of available options.
-	 */
-	public function __construct(array $options = [])
+	public function __construct(
+		array $options = [])
 	{
+		/**
+		 * @psalm-suppress PropertyTypeCoercion
+		 */
 		$this->options = \array_merge($this->options, $options);
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function setDebug(bool $debug): HandlerAbstract
+	public function execute(RequestInterface $request, ResponseInterface $response): ResponseInterface
 	{
-		$this->debug = $debug;
-		return $this;
+		$context = \stream_context_create(
+			[
+				"http" => \array_merge(
+					[
+						"protocol_version" => $request->getProtocolVersion(),
+						"method" => $request->getMethod(),
+						"user_agent" => $request->getHeaderLine("User-Agent"),
+						"header" => $this->buildRequestHeaders($request->getHeaders()),
+						"content" => $request->getBody()->getContents(),
+					],
+					$this->options
+				)
+			]
+		);
+
+		$stream = \fopen((string) $request->getUri(), "r", false, $context);
+
+		if( $stream === false ){
+			$error = \error_get_last();
+			throw new RequestException(
+				$request,
+				$error["message"] ?? "Failed to open stream",
+				$error["code"] ?? -1
+			);
+		}
+
+		$response = $this->parseResponse($stream, $response);
+
+		if( \fclose($stream) === false ){
+			throw new RequestException(
+				$request,
+				"Failed to close stream context."
+			);
+		}
+
+		return $response;
 	}
 
-	/**
-	 * @inheritDoc
-	 */
-	public function execute(RequestInterface $request): ResponseInterface
-	{
-		$stream = $this->buildStream($request, ['http' => $this->buildHttpContext($request)]);
-
-		return $this->createResponse($stream);
-	}
-
-	/**
-	 * Build the HTTP context options.
-	 *
-	 * @param RequestInterface $request
-	 * @return array<string, mixed>
-	 */
-	private function buildHttpContext(RequestInterface $request): array
-	{
-		return \array_merge($this->options, [
-			'protocol_version' => $request->getProtocolVersion(),
-			'method' => $request->getMethod(),
-			'header' => $this->buildRequestHeaders($request->getHeaders()),
-			'content' => $request->getBody() ? $request->getBody()->getContents() : null
-		]);
-	}
 
 	/**
 	 * Build the request headers.
 	 *
-	 * @param array $requestHeaders
+	 * @param array<string,array<string>> $request_headers
 	 * @return array<string>
 	 */
-	private function buildRequestHeaders(array $requestHeaders): array
+	private function buildRequestHeaders(array $request_headers): array
 	{
 		$headers = [];
 
-		foreach( $requestHeaders as $key => $values ){
+		foreach( $request_headers as $key => $values ){
 			foreach( $values as $value ){
 				$headers[] = "{$key}: {$value}";
 			}
@@ -96,128 +101,28 @@ class StreamContextHandler extends HandlerAbstract
 	}
 
 	/**
-	 * Build the stream.
-	 *
-	 * @param RequestInterface $request
-	 * @param array<string, array<string, mixed>> $contextOptions
-	 * @throws RequestException
-	 * @return StreamInterface
-	 */
-	private function buildStream(RequestInterface $request, array $contextOptions): StreamInterface
-	{
-		if( $this->debug ){
-			$params = [
-				"notification" => [$this, "debug"]
-			];
-		}
-
-		$context = \stream_context_create($contextOptions, $params ?? []);
-
-		if( ($stream = @\fopen((string) $request->getUri(), 'r', false, $context)) === false ){
-
-			$error = \error_get_last();
-
-			throw new RequestException($request, $error["message"] ?? "Failed to open stream", $error["code"] ?? -1);
-
-		}
-
-		return new ResourceStream($stream);
-	}
-
-	/**
 	 * Create the Response object from the Stream.
 	 *
-	 * @param StreamInterface $stream
+	 * @param resource $stream
+	 * @param ResponseInterface $response
 	 * @return ResponseInterface
 	 */
-	private function createResponse(StreamInterface $stream): ResponseInterface
+	private function parseResponse($stream, ResponseInterface $response): ResponseInterface
 	{
-		$response = new Response(200);
+		$raw_response = \sprintf(
+			"%s\r\n",
+			\implode("\r\n", \stream_get_meta_data($stream)["wrapper_data"] ?? [])
+		);
 
-		// Grab the headers from the Stream meta data
-		$responseHeaders = $stream->getMetadata('wrapper_data') ?? [];
+		$body = \stream_get_contents($stream);
 
-		// Process the headers
-		foreach( $responseHeaders as $header ){
-			if( \preg_match("/^HTTP\/([\d\.]+) ([\d]{3})(?: ([\w\h]+))?\R?+$/i", \trim($header), $httpResponse) ){
-				$response = $response->withProtocolVersion($httpResponse[1])
-				->withStatus((int) $httpResponse[2], $httpResponse[3]);
-			}
-
-			elseif( \preg_match("/^([\w\-]+)\: (\N+)\R?+$/", \trim($header), $httpHeader) ){
-				$response = $response->withAddedHeader($httpHeader[1], $httpHeader[2]);
-			}
+		if( $body === false ){
+			throw new HandlerException("Failed to read response body from stream.");
+		}
+		elseif( $body ){
+			$raw_response .= ("\r\n" . $body);
 		}
 
-		return $response;
-	}
-
-	/**
-	 * Debug request and response.
-	 *
-	 * @param int $notification_code
-	 * @param int $severity
-	 * @param string|null $message
-	 * @param int $message_code
-	 * @param int $bytes_transferred
-	 * @param int $bytes_max
-	 * @return void
-	 */
-	private function debug(int $notification_code, int $severity, ?string $message, int $message_code, int $bytes_transferred, int $bytes_max): void
-	{
-		switch( $notification_code ){
-
-			case STREAM_NOTIFY_CONNECT:
-				$notification = "CONNECTED";
-				break;
-
-			case STREAM_NOTIFY_RESOLVE:
-				$notification = "RESOLVED";
-				break;
-
-			case STREAM_NOTIFY_AUTH_REQUIRED:
-				$notification = "AUTH REQUIRED";
-				break;
-
-			case STREAM_NOTIFY_COMPLETED:
-				$notification = "COMPLETED";
-				break;
-
-			case STREAM_NOTIFY_FAILURE:
-				$notification = "FAILURE";
-				break;
-
-			case STREAM_NOTIFY_AUTH_RESULT:
-				$notification = "AUTH RESULT";
-				break;
-
-			case STREAM_NOTIFY_REDIRECTED:
-				$notification = "REDIRECT";
-				break;
-
-			case STREAM_NOTIFY_FILE_SIZE_IS:
-				$notification = "FILE SIZE";
-				break;
-
-			case STREAM_NOTIFY_MIME_TYPE_IS:
-				$notification = "MIME TYPE";
-				break;
-
-			case STREAM_NOTIFY_PROGRESS:
-				$notification = "PROGRESS";
-				break;
-
-			default:
-				$notification = "UNKNOWN";
-		}
-
-		echo
-			"************\n" .
-			"Notification: {$notification}\n" .
-			"Severity: {$severity}\n" .
-			"Message: " . \trim($message ?? "") . "\n" .
-			//"Message code: {$message_code}\n" .
-			"Bytes Transfered: {$bytes_transferred}\n" .
-			"************\n\n";
+		return $this->parseRawResponse($raw_response, $response);
 	}
 }

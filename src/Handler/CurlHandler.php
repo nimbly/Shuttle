@@ -1,32 +1,23 @@
-<?php declare(strict_types=1);
+<?php
 
-namespace Shuttle\Handler;
+namespace Nimbly\Shuttle\Handler;
 
-use Capsule\Response;
-use Capsule\Stream\ResourceStream;
+use CurlHandle;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\StreamInterface;
-use Shuttle\RequestException;
+use Nimbly\Shuttle\HandlerException;
+use Nimbly\Shuttle\RequestException;
 
-class CurlHandler extends HandlerAbstract
+class CurlHandler implements HandlerInterface
 {
-	/**
-	 * Maximum amount of memory (in bytes) to use before swapping
-	 * response body to disk.
-	 *
-	 * Defaults to 2097152 bytes (2MB).
-	 *
-	 * @var integer
-	 */
-	protected $maxResponseBodyMemory = 2097152;
+	private CurlHandle $curlHandle;
 
 	/**
 	 * Set of default options.
 	 *
-	 * @var array
+	 * @var array<int,mixed>
 	 */
-	protected $options = [
+	protected array $options = [
 		CURLOPT_FOLLOWLOCATION => true,
 		CURLOPT_MAXREDIRS => 10,
 		CURLOPT_HEADER => false,
@@ -38,68 +29,47 @@ class CurlHandler extends HandlerAbstract
 		CURLOPT_VERBOSE => false
 	];
 
-	/**
-	 * Curl Resource instance.
-	 *
-	 * @var resource
-	 */
-	private $curlResource;
 
 	/**
 	 * CurlHandler constructor.
 	 *
-	 * @param array $options Array of CURLOPT_* => value key pairs that is passed into curl handler.
-	 *
+	 * @param array<int,mixed> $curl_options Array of CURLOPT_* => value key pairs that is passed into curl handler.
+	 * @throws HandlerException
 	 */
-	public function __construct(array $options = [])
+	public function __construct(
+		array $curl_options = [])
 	{
-		$this->curlResource = \curl_init();
-		$this->options += $options;
-	}
+		$handle = \curl_init();
 
-	/**
-	 * Set the maximum amount of memory the response body may consume before
-	 * swapping to disk. Defaults to 2097152 bytes (2MB).
-	 *
-	 * @param integer $bytes
-	 * @return CurlHandler
-	 */
-	public function setMaxResponseBodyMemory(int $bytes): CurlHandler
-	{
-		$this->maxResponseBodyMemory = $bytes;
-		return $this;
-	}
+		if( $handle === false ){
+			throw new HandlerException("Could not initialize cURL.");
+		}
 
-	/**
-	 * @inheritDoc
-	 */
-	public function setDebug(bool $debug): HandlerAbstract
-	{
-		$this->options[CURLOPT_VERBOSE] = $debug;
-		return $this;
+		$this->curlHandle = $handle;
+		$this->options += $curl_options;
 	}
 
 	/**
 	 * Execute the given request.
 	 *
 	 * @param RequestInterface $request
+	 * @param ResponseInterface $response
 	 * @return ResponseInterface
 	 */
-	public function execute(RequestInterface $request): ResponseInterface
+	public function execute(RequestInterface $request, ResponseInterface $response): ResponseInterface
 	{
-		$handler = $this->curlResource;
-
-		// Create a new Response with php://temp body and set response code to 200 (for now).
-		$response = new Response(200,
-			$this->makeResponseBodyStream()
+		// Set the default cURL options
+		\curl_setopt_array(
+			$this->curlHandle,
+			$this->options + $this->buildCurlRequestOptions($request, $response)
 		);
 
-		// Set the default cURL options
-		\curl_setopt_array($handler, $this->options + $this->buildCurlRequestOptions($request, $response));
-
-		// Attempt to execute the request
-		if( \curl_exec($handler) === false ){
-			throw new RequestException($request, \curl_strerror(\curl_errno($handler)) ?? "Unknown error", \curl_errno($handler));
+		if( \curl_exec($this->curlHandle) === false ){
+			throw new RequestException(
+				$request,
+				\curl_strerror(\curl_errno($this->curlHandle)) ?? "Unknown error",
+				\curl_errno($this->curlHandle)
+			);
 		}
 
 		// Rewind the body before passing it back.
@@ -111,25 +81,13 @@ class CurlHandler extends HandlerAbstract
 	}
 
 	/**
-	 * Make the php://temp response stream.
-	 *
-	 * @return StreamInterface
-	 */
-	protected function makeResponseBodyStream(): StreamInterface
-	{
-		return new ResourceStream(
-			\fopen("php://temp/maxmemory:{$this->maxResponseBodyMemory}", "w+")
-		);
-	}
-
-	/**
 	 * Build the cURL option set for the given request.
 	 *
 	 * @param RequestInterface $request
-	 * @param Response $response
+	 * @param ResponseInterface $response
 	 * @return array
 	 */
-	protected function buildCurlRequestOptions(RequestInterface $request, Response &$response): array
+	protected function buildCurlRequestOptions(RequestInterface $request, ResponseInterface &$response): array
 	{
 		$curlOptions = [
 
@@ -146,7 +104,7 @@ class CurlHandler extends HandlerAbstract
 			 * @param string $data
 			 * @return int
 			 */
-			CURLOPT_WRITEFUNCTION => function($handler, string $data) use (&$response): int {
+			CURLOPT_WRITEFUNCTION => function(CurlHandle $handler, string $data) use (&$response): int {
 
 				return $response->getBody()->write($data);
 			},
@@ -158,7 +116,7 @@ class CurlHandler extends HandlerAbstract
 			 * @param string $header
 			 * @return int
 			 */
-			CURLOPT_HEADERFUNCTION => function($handler, string $header) use (&$response): int {
+			CURLOPT_HEADERFUNCTION => function(CurlHandle $handler, string $header) use (&$response): int {
 
 				if( \preg_match("/^HTTP\/([\d\.]+) ([\d]{3})(?: ([\w\h]+))?\R?+$/i", \trim($header), $httpResponse) ){
 					$response = $response->withStatus((int) $httpResponse[2], $httpResponse[3] ?? "");
@@ -175,8 +133,8 @@ class CurlHandler extends HandlerAbstract
 		];
 
 		// Set the request body (if applicable)
-		if( $request->getBody() &&
-			\in_array($request->getMethod(), ["POST", "PUT", "PATCH"]) ){
+		if( $request->getBody()->getSize() &&
+			\in_array(\strtoupper($request->getMethod()), ["POST", "PUT", "PATCH"]) ){
 			$curlOptions[CURLOPT_POSTFIELDS] = $request->getBody()->getContents();
 		}
 
@@ -191,19 +149,11 @@ class CurlHandler extends HandlerAbstract
 	 */
 	private function buildRequestHttpProtocolVersion(RequestInterface $request): int
 	{
-		$version = $request->getProtocolVersion();
-
-		if( $version == 2.0 ){
-			return CURL_HTTP_VERSION_2;
-		}
-
-		elseif( $version == 1.0 ){
-			return CURL_HTTP_VERSION_1_0;
-		}
-
-		else {
-			return CURL_HTTP_VERSION_1_1;
-		}
+		return match($request->getProtocolVersion()) {
+			"2", "2.0" => CURL_HTTP_VERSION_2,
+			"1", "1.0" => CURL_HTTP_VERSION_1_0,
+			default => CURL_HTTP_VERSION_1_1
+		};
 	}
 
 	/**

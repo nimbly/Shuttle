@@ -1,10 +1,10 @@
-<?php declare(strict_types=1);
+<?php
 
-namespace Shuttle\Body;
+namespace Nimbly\Shuttle\Body;
+
+use Nimbly\Shuttle\EncodingException;
 
 /**
- * @package Shuttle\Body
- *
  * Formats an associative array as a JSON encoded string.
  *
  * Sets the Content-Type as "application/json" by default.
@@ -14,20 +14,24 @@ class JsonBody extends BufferBody
 	/**
 	 * @inheritDoc
 	 */
-	protected $contentType = "application/json";
+	protected string $content_type = "application/json";
 
 	/**
-	 * JsonBody constructor.
-	 *
 	 * @param array $data
-	 * @param string|null $contentType
+	 * @param string|null $content_type
 	 */
-	public function __construct(array $data, string $contentType = null)
+	public function __construct(array $data, ?string $content_type = null)
 	{
-		$this->buffer = (string) \json_encode($data);
+		$json = \json_encode($data, JSON_UNESCAPED_SLASHES);
 
-		if( $contentType ){
-			$this->contentType = $contentType;
+		if( $json === false ){
+			throw new EncodingException("Failed to encode body as JSON.");
+		}
+
+		$this->buffer = $json;
+
+		if( $content_type ){
+			$this->content_type = $content_type;
 		}
 	}
 }

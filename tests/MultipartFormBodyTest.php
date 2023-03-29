@@ -1,33 +1,33 @@
 <?php
 
-namespace Shuttle\Tests;
+namespace Nimbly\Shuttle\Tests;
 
-use Capsule\Stream\BufferStream;
+use Nimbly\Capsule\Stream\BufferStream;
 use PHPUnit\Framework\TestCase;
-use Shuttle\Body\FileUploadBody;
-use Shuttle\Body\FormBody;
-use Shuttle\Body\JsonBody;
-use Shuttle\Body\MultipartFormBody;
+use Nimbly\Shuttle\Body\FileUploadBody;
+use Nimbly\Shuttle\Body\FormBody;
+use Nimbly\Shuttle\Body\JsonBody;
+use Nimbly\Shuttle\Body\MultipartFormBody;
 
 /**
- * @covers Shuttle\Body\MultipartFormBody
- * @covers Shuttle\Body\FormBody
- * @covers Shuttle\Body\FileUploadBody
+ * @covers Nimbly\Shuttle\Body\MultipartFormBody
+ * @covers Nimbly\Shuttle\Body\FormBody
+ * @covers Nimbly\Shuttle\Body\FileUploadBody
  */
 class MultipartFormBodyTest extends TestCase
 {
 	public function test_multiple_parts()
 	{
 		$multiPartFormBody = new MultipartFormBody([
-			'form' => new FormBody([
-				'email' => 'user@example.com',
-				'name' => 'Example User',
+			"form" => new FormBody([
+				"email" => "user@example.com",
+				"name" => "Example User",
 			]),
 
-			'file' => new FileUploadBody(
+			"file" => new FileUploadBody(
 				new BufferStream("Capsule!"),
-				'plain.txt',
-				'text/plain'
+				"plain.txt",
+				"text/plain"
 			)
 		]);
 
@@ -44,15 +44,15 @@ class MultipartFormBodyTest extends TestCase
 		$this->expectException(\Exception::class);
 
 		$multiPartFormBody = new MultipartFormBody([
-			'form' => new FormBody([
-				'email' => 'user@example.com',
-				'name' => 'Example User',
+			"form" => new FormBody([
+				"email" => "user@example.com",
+				"name" => "Example User",
 			]),
 
 			new FileUploadBody(
 				new BufferStream("Capsule!"),
-				'plain.txt',
-				'text/plain'
+				"plain.txt",
+				"text/plain"
 			)
 		]);
 	}

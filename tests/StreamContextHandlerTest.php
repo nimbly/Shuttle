@@ -1,58 +1,46 @@
 <?php
 
-namespace Shuttle\Tests;
+namespace Nimbly\Shuttle\Tests;
 
-use Capsule\Request;
-use Capsule\Response;
-use Capsule\Stream\BufferStream;
+use Nimbly\Capsule\Request;
+use Nimbly\Capsule\Response;
+use Nimbly\Shuttle\Handler\StreamContextHandler;
+use Nimbly\Shuttle\RequestException;
 use PHPUnit\Framework\TestCase;
-use Shuttle\Handler\StreamContextHandler;
-use Shuttle\RequestException;
+use ReflectionClass;
 
 /**
- * @covers Shuttle\Handler\StreamContextHandler
- * @covers Shuttle\RequestException
+ * @covers Nimbly\Shuttle\Handler\StreamContextHandler
+ * @covers Nimbly\Shuttle\RequestException
  */
 class StreamContextHandlerTest extends TestCase
 {
-	public function test_default_options()
+	public function test_default_options(): void
 	{
-		$streamHandler = new StreamContextHandler;
-		$reflection = new \ReflectionClass($streamHandler);
+		$streamContextHandler = new StreamContextHandler;
 
-		$property = $reflection->getProperty("options");
-		$property->setAccessible(true);
+		$reflectionClass = new ReflectionClass($streamContextHandler);
+		$reflectionProperty = $reflectionClass->getProperty("options");
+		$reflectionProperty->setAccessible(true);
 
-		$options = $property->getValue($streamHandler);
+		$options = $reflectionProperty->getValue($streamContextHandler);
 
-		$this->assertEquals(1, $options['follow_location']);
-		$this->assertEquals(10, $options['max_redirects']);
-		$this->assertEquals(120, $options['timeout']);
-		$this->assertEquals(true, $options['ignore_errors']);
-		$this->assertEquals(false, $options['request_fulluri']);
+		$this->assertEquals(0, $options["follow_location"]);
+		$this->assertEquals(10, $options["max_redirects"]);
+		$this->assertEquals(120, $options["timeout"]);
+		$this->assertEquals(true, $options["ignore_errors"]);
+		$this->assertEquals(false, $options["request_fulluri"]);
 	}
 
-	public function test_set_debug()
+	public function test_build_request_headers(): void
 	{
-		$streamHandler = new StreamContextHandler;
-		$reflection = new \ReflectionClass($streamHandler);
+		$streamContextHandler = new StreamContextHandler;
+		$reflectionClass = new ReflectionClass($streamContextHandler);
 
-		$streamHandler->setDebug(true);
-		$debug = $reflection->getProperty("debug");
-		$debug->setAccessible(true);
+		$reflectionMethod = $reflectionClass->getMethod("buildRequestHeaders");
+		$reflectionMethod->setAccessible(true);
 
-		$this->assertTrue($debug->getValue($streamHandler));
-	}
-
-	public function test_build_request_headers()
-	{
-		$streamHandler = new StreamContextHandler;
-		$reflection = new \ReflectionClass($streamHandler);
-
-		$method = $reflection->getMethod('buildRequestHeaders');
-		$method->setAccessible(true);
-
-		$headers = $method->invokeArgs($streamHandler, [
+		$headers = $reflectionMethod->invokeArgs($streamContextHandler, [
 			["X-Header-1" => ["Foo"], "X-Header-2" => ["Bar"]]
 		]);
 
@@ -62,54 +50,13 @@ class StreamContextHandlerTest extends TestCase
 		], $headers);
 	}
 
-	public function test_build_http_context()
+	public function test_execute_request(): void
 	{
-		$streamHandler = new StreamContextHandler;
-		$reflection = new \ReflectionClass($streamHandler);
+		$streamContextHandler = new StreamContextHandler;
 
-		$method = $reflection->getMethod('buildHttpContext');
-		$method->setAccessible(true);
-
-		$request = new Request("post", "http://example.com", "Ok", ["X-Header-1" => "Foo"], "2");
-
-		$httpContext = $method->invoke($streamHandler, $request);
-
-		$this->assertEquals([
-			'follow_location' => 1,
-			'request_fulluri' => false,
-			'max_redirects' => 10,
-			'ignore_errors' => true,
-			'timeout' => 120,
-			'method' => 'POST',
-			'protocol_version' => '2',
-			'header' => [
-				"Host: example.com",
-				"X-Header-1: Foo"
-			],
-			'content' => 'Ok'
-		], $httpContext);
-	}
-
-	public function test_build_stream_with_invalid_uri_throws()
-	{
-		$streamHandler = new StreamContextHandler;
-		$reflection = new \ReflectionClass($streamHandler);
-
-		$method = $reflection->getMethod('buildStream');
-		$method->setAccessible(true);
-
-		$request = new Request("get", "http://localhost:1");
-
-		$this->expectException(RequestException::class);
-		$stream = $method->invokeArgs($streamHandler, [$request, ['http' => ['method' => 'GET', 'protocol_version' => '1.1']]]);
-	}
-
-	public function test_execute_request()
-	{
-		$streamHandler = new StreamContextHandler;
-
-		$response = $streamHandler->execute(
-			new Request("get", "https://github.com")
+		$response = $streamContextHandler->execute(
+			new Request("get", "https://github.com"),
+			new Response(200)
 		);
 
 		$this->assertTrue(($response instanceof Response));

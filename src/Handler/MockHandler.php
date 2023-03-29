@@ -1,47 +1,32 @@
-<?php declare(strict_types=1);
+<?php
 
-namespace Shuttle\Handler;
+namespace Nimbly\Shuttle\Handler;
 
-use Capsule\Response;
+use Nimbly\Shuttle\HandlerException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class MockHandler extends HandlerAbstract
+class MockHandler implements HandlerInterface
 {
-	/**
-	 * Array of pre-fab Response objects to be returned with requests.
-	 *
-	 * @var array<ResponseInterface|callable>
-	 */
-	protected $responses = [];
-
-	/**
-	 * Debug mode flag.
-	 *
-	 * @var boolean
-	 */
-	protected $debug = false;
-
 	/**
 	 * MockHandler constructor.
 	 *
 	 * Pass in an array of Response instances that will be returned. You may also
-	 * pass in a closure that takes the Request and must return a Response.
+	 * pass in a closure that takes a RequestInterface and must return a ResponseInterface.
 	 *
-	 * @param array<Response|callable> $responses
+	 * @param array<ResponseInterface|callable> $responses
 	 */
-	public function __construct(array $responses)
+	public function __construct(protected array $responses = [])
 	{
-		$this->responses = $responses;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function execute(RequestInterface $request): ResponseInterface
+	public function execute(RequestInterface $request, ResponseInterface $response): ResponseInterface
 	{
 		if( empty($this->responses) ){
-			throw new \Exception("No more responses available in MockHandler response queue.");
+			throw new HandlerException("No more responses available in MockHandler response queue.");
 		}
 
 		$response = \array_shift($this->responses);
@@ -51,14 +36,5 @@ class MockHandler extends HandlerAbstract
 		}
 
 		return $response;
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public function setDebug(bool $debug): HandlerAbstract
-	{
-		$this->debug = $debug;
-		return $this;
 	}
 }

@@ -1,16 +1,15 @@
 <?php
 
-namespace Shuttle\Tests;
+namespace Nimbly\Shuttle\Tests;
 
-use Capsule\Request;
-use Capsule\Response;
-use Capsule\Stream\BufferStream;
+use Nimbly\Capsule\Request;
+use Nimbly\Capsule\Response;
+use Nimbly\Capsule\Stream\BufferStream;
 use PHPUnit\Framework\TestCase;
-use Shuttle\Handler\MockHandler;
+use Nimbly\Shuttle\Handler\MockHandler;
 
 /**
- * @covers Shuttle\Handler\MockHandler
- * @covers Shuttle\Handler\HandlerAbstract
+ * @covers Nimbly\Shuttle\Handler\MockHandler
  */
 class MockHandlerTest extends TestCase
 {
@@ -20,7 +19,10 @@ class MockHandlerTest extends TestCase
 			new Response(200, new BufferStream("Ok"))
 		]);
 
-		$response = $mockHandler->execute(new Request("get", "http://example.com"));
+		$response = $mockHandler->execute(
+			new Request("get", "http://example.com"),
+			new Response(200)
+		);
 
 		$this->assertTrue($response instanceof Response);
 	}
@@ -33,7 +35,10 @@ class MockHandlerTest extends TestCase
 			}
 		]);
 
-		$response = $mockHandler->execute(new Request("get", "http://example.com"));
+		$response = $mockHandler->execute(
+			new Request("get", "http://example.com"),
+			new Response(200)
+		);
 
 		$this->assertTrue($response instanceof Response);
 	}
@@ -42,18 +47,9 @@ class MockHandlerTest extends TestCase
 	{
 		$this->expectException(\Exception::class);
 		$mockHandler = new MockHandler([]);
-		$mockHandler->execute(new Request("get", "http://example.com"));
-	}
-
-	public function test_setting_debug_mode()
-	{
-		$mockHandler = new MockHandler([]);
-		$mockHandler->setDebug(true);
-
-		$reflection = new \ReflectionClass($mockHandler);
-		$debug = $reflection->getProperty('debug');
-		$debug->setAccessible(true);
-
-		$this->assertTrue($debug->getValue($mockHandler));
+		$mockHandler->execute(
+			new Request("get", "http://example.com"),
+			new Response(200)
+		);
 	}
 }

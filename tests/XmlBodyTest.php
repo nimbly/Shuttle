@@ -1,14 +1,14 @@
 <?php
 
-namespace Shuttle\Tests;
+namespace Nimbly\Shuttle\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Shuttle\Body\XmlBody;
+use Nimbly\Shuttle\Body\XmlBody;
 
 /**
- * @covers Shuttle\Body\XmlBody
- * @covers Shuttle\Body\BufferBody
- * @covers Capsule\Stream\BufferStream
+ * @covers Nimbly\Shuttle\Body\XmlBody
+ * @covers Nimbly\Shuttle\Body\BufferBody
+ * @covers Nimbly\Capsule\Stream\BufferStream
  */
 class XmlBodyTest extends TestCase
 {
@@ -34,7 +34,7 @@ class XmlBodyTest extends TestCase
 		</book>
 
 		<book>
-			<title>Time's Arrow</title>
+			<title>Time"s Arrow</title>
 			<author>Martin Amis</title>
 		</book>
 </books>

@@ -1,14 +1,14 @@
 <?php
 
-namespace Shuttle\Tests;
+namespace Nimbly\Shuttle\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Shuttle\Body\JsonBody;
+use Nimbly\Shuttle\Body\JsonBody;
 
 /**
- * @covers Shuttle\Body\JsonBody
- * @covers Shuttle\Body\BufferBody
- * @covers Capsule\Stream\BufferStream
+ * @covers Nimbly\Shuttle\Body\JsonBody
+ * @covers Nimbly\Shuttle\Body\BufferBody
+ * @covers Nimbly\Capsule\Stream\BufferStream
  */
 class JsonBodyTest extends TestCase
 {
@@ -35,6 +35,6 @@ class JsonBodyTest extends TestCase
 			]
 		);
 
-		$this->assertEquals('{"name":"John Doe","email":"jdoe@example.com"}', $jsonBody->getContents());
+		$this->assertEquals("{\"name\":\"John Doe\",\"email\":\"jdoe@example.com\"}", $jsonBody->getContents());
 	}
 }

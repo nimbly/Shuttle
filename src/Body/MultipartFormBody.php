@@ -1,29 +1,26 @@
 <?php
 
-namespace Shuttle\Body;
+namespace Nimbly\Shuttle\Body;
 
-use Capsule\Stream\BufferStream;
+use Nimbly\Capsule\Stream\BufferStream;
+use Nimbly\Shuttle\EncodingException;
 
 
 class MultipartFormBody extends BufferStream implements BodyInterface
 {
 	/**
 	 * Multi-part content type, without boundary.
-	 *
-	 * @var string
 	 */
-	protected $contentType = "multipart/form-data";
+	protected string $content_type = "multipart/form-data";
 
 	/**
 	 * Boundary string.
 	 *
 	 * @var string
 	 */
-	protected $boundary;
+	protected string $boundary;
 
 	/**
-	 * MultipartFormBody constructor.
-	 *
 	 * @param array<string,PartInterface> $parts
 	 */
 	public function __construct(array $parts)
@@ -39,7 +36,7 @@ class MultipartFormBody extends BufferStream implements BodyInterface
 
 			/** @psalm-suppress DocblockTypeContradiction */
 			if( !\is_string($name) ){
-				throw new \Exception('Please provide a name for each part of a Multipart request.');
+				throw new EncodingException("Please provide a name for each part of a Multipart request.");
 			}
 
 			$this->write(
@@ -65,6 +62,10 @@ class MultipartFormBody extends BufferStream implements BodyInterface
 	 */
 	public function getContentType(): string
 	{
-		return "{$this->contentType};boundary={$this->boundary}";
+		return \sprintf(
+			"%s;boundary=%s",
+			$this->content_type,
+			$this->boundary
+		);
 	}
 }

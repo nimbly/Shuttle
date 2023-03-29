@@ -1,6 +1,6 @@
-<?php declare(strict_types=1);
+<?php
 
-namespace Shuttle\Body;
+namespace Nimbly\Shuttle\Body;
 
 /**
  * @package Shuttle\Body
@@ -15,20 +15,20 @@ class FormBody extends BufferBody
 	/**
 	 * @inheritDoc
 	 */
-	protected $contentType = "application/x-www-form-urlencoded";
+	protected string $content_type = "application/x-www-form-urlencoded";
 
 	/**
 	 * FormBody constructor.
 	 *
 	 * @param array $data
-	 * @param string|null $contentType
+	 * @param string|null $content_type
 	 */
-	public function __construct(array $data, string $contentType = null)
+	public function __construct(array $data, ?string $content_type = null)
 	{
 		$this->buffer = \http_build_query($data, "n", "&", PHP_QUERY_RFC1738);
 
-		if( $contentType ){
-			$this->contentType = $contentType;
+		if( $content_type ){
+			$this->content_type = $content_type;
 		}
 	}
 
@@ -44,7 +44,7 @@ class FormBody extends BufferBody
 
 		foreach( $formFields as $name => $value ){
 			$multiPart .= "\r\n--{$boundary}\r\n";
-			$multiPart .= 'Content-Disposition: form-data; name="' . $name . '"' . "\r\n\r\n";
+			$multiPart .= "Content-Disposition: form-data; name=\"" . $name . "\"" . "\r\n\r\n";
 			$multiPart .= $value;
 		}
 

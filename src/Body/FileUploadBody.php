@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php
 
-namespace Shuttle\Body;
+namespace Nimbly\Shuttle\Body;
 
-use Capsule\Stream\ResourceStream;
+use Nimbly\Capsule\Stream\ResourceStream;
+use Nimbly\Shuttle\FileException;
 use Psr\Http\Message\StreamInterface;
 
 /**
@@ -18,48 +19,46 @@ class FileUploadBody extends BufferBody
 	 *
 	 * @var StreamInterface
 	 */
-	protected $stream;
+	protected StreamInterface $stream;
 
 	/**
 	 * File name to use in multipart/form-data content disposition.
 	 *
 	 * @var string
 	 */
-	protected $fileName;
+	protected string $file_name;
 
 	/**
 	 * The file's content type.
 	 *
 	 * @var string
 	 */
-	protected $fileContentType;
+	protected string $content_type;
 
 	/**
-	 * FileUpload constructor
-	 *
-	 * @param StreamInterface|string $file StreamInterface instance of file or the full path of file to open.
-	 * @param string|null $fileName Filename to assign to content.
-	 * @param string|null $contentType File mime content type.
+	 * @param StreamInterface|string $file StreamInterface instance of file or a string that is the full path of file to open for reading.
+	 * @param string|null $file_name Filename to assign to content.
+	 * @param string|null $content_type File mime content type.
+	 * @throws \Exception
 	 */
-	public function __construct($file, ?string $fileName = null, string $contentType = null)
+	public function __construct(StreamInterface|string $file, ?string $file_name = null, string $content_type = null)
 	{
-		if( ($file instanceof StreamInterface) === false ){
-			$this->stream = new ResourceStream(
-				\fopen($file, "r")
-			);
+		if( \is_string($file)){
+			$fh = \fopen($file, "r");
 
-			$this->fileName = $fileName ?? \basename($file);
-			$this->fileContentType = $contentType ?? \mime_content_type($file);
+			if( $fh === false ){
+				throw new FileException("Failed to open {$file} for reading.");
+			}
+
+			$file = new ResourceStream($fh);
 		}
 
-		else {
-			$this->stream = $file;
-			/**
-			 * @psalm-suppress PossiblyInvalidArgument
-			 */
-			$this->fileName = $fileName ?? \basename($file->getMetadata('uri') ?? "file");
-			$this->fileContentType = $contentType ?? 'text/plain';
-		}
+		$this->stream = $file;
+		/**
+		 * @psalm-suppress PossiblyInvalidArgument
+		 */
+		$this->file_name = $file_name ?? \basename($file->getMetadata("uri") ?? "file");
+		$this->content_type = $content_type ?? "text/plain";
 	}
 
 	/**
@@ -72,17 +71,14 @@ class FileUploadBody extends BufferBody
 			$this->stream->rewind();
 		}
 
-		if( empty($name) ){
-			$name = "file";
-		}
-
-		// Build out multi-part
-		$multipart = "\r\n--{$boundary}\r\n";
-		$multipart .= "Content-Disposition: form-data; name=\"{$name}\"; filename=\"{$this->fileName}\"\r\n";
-		$multipart .= "Content-Type: {$this->fileContentType}\r\n";
-		$multipart .= "Content-Length: {$this->stream->getSize()}\r\n\r\n";
-		$multipart .= $this->stream->getContents();
-
-		return $multipart;
+		return \sprintf(
+			"\r\n--%s\r\nContent-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\nContent-Type: %s\r\nContent-Length: %s\r\n\r\n%s",
+			$boundary,
+			$name ?? "file",
+			$this->file_name,
+			$this->content_type,
+			$this->stream->getSize() ?? 0,
+			$this->stream->getContents()
+		);
 	}
 }

@@ -1,14 +1,14 @@
 <?php
 
-namespace Shuttle\Tests;
+namespace Nimbly\Shuttle\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Capsule\Request;
-use Shuttle\RequestException;
+use Nimbly\Capsule\Request;
+use Nimbly\Shuttle\RequestException;
 use Psr\Http\Message\RequestInterface;
 
 /**
- * @covers Shuttle\RequestException
+ * @covers Nimbly\Shuttle\RequestException
  */
 class RequestExceptionTest extends TestCase
 {

@@ -1,52 +1,42 @@
 <?php
 
-namespace Shuttle\Tests;
+namespace Nimbly\Shuttle\Tests;
 
-use Capsule\Request;
-use Capsule\Response;
-use Capsule\Stream\BufferStream;
+use Nimbly\Capsule\Request;
+use Nimbly\Capsule\Response;
+use Nimbly\Capsule\Stream\BufferStream;
 use PHPUnit\Framework\TestCase;
-use Shuttle\Body\BufferBody;
-use Shuttle\Handler\HandlerAbstract;
-use Shuttle\Handler\MockHandler;
-use Shuttle\Shuttle;
+use Nimbly\Shuttle\Body\BufferBody;
+use Nimbly\Shuttle\Handler\HandlerInterface;
+use Nimbly\Shuttle\Handler\MockHandler;
+use Nimbly\Shuttle\Shuttle;
 
 /**
- * @covers Shuttle\Shuttle
- * @covers Shuttle\Handler\MockHandler
- * @covers Shuttle\Handler\CurlHandler
- * @covers Shuttle\Body\BufferBody
- * @covers Shuttle\Handler\HandlerAbstract
+ * @covers Nimbly\Shuttle\Shuttle
+ * @covers Nimbly\Shuttle\Handler\MockHandler
+ * @covers Nimbly\Shuttle\Handler\CurlHandler
+ * @covers Nimbly\Shuttle\Body\BufferBody
  */
 class ShuttleTest extends TestCase
 {
-	public function test_default_user_agent_prefix()
+	public function test_default_user_agent_prefix(): void
 	{
-		$this->assertEquals("Shuttle/1.0", Shuttle::SHUTTLE_USER_AGENT);
+		$this->assertEquals("Shuttle/2.0", Shuttle::SHUTTLE_USER_AGENT);
 	}
 
-	public function test_shuttle_creates_default_handler()
+	public function test_shuttle_creates_default_handler(): void
 	{
 		$shuttle = new Shuttle;
-		$this->assertTrue($shuttle->getHandler() instanceof HandlerAbstract);
+		$this->assertTrue($shuttle->getHandler() instanceof HandlerInterface);
 	}
 
-	public function test_passing_non_handler_as_option_throws_exception()
+	public function test_get_response_received(): void
 	{
-		$this->expectException(\Exception::class);
-
-		$shuttle = new Shuttle([
-			'handler' => 'NotAHandler',
-		]);
-	}
-
-	public function test_get_response_received()
-	{
-		$shuttle = new Shuttle([
-			'handler' => new MockHandler([
+		$shuttle = new Shuttle(
+			handler: new MockHandler([
 				new Response(200, new BufferStream("OK"), ["Content-Type" => "text/plain"]),
 			])
-		]);
+		);
 
 		$response = $shuttle->get("http://example.com");
 
@@ -56,13 +46,13 @@ class ShuttleTest extends TestCase
 		$this->assertEquals("text/plain", $response->getHeaderLine("Content-Type"));
 	}
 
-	public function test_post_response_received()
+	public function test_post_response_received(): void
 	{
-		$shuttle = new Shuttle([
-			'handler' => new MockHandler([
+		$shuttle = new Shuttle(
+			handler: new MockHandler([
 				new Response(201, new BufferStream("OK"), ["Content-Type" => "text/plain"]),
 			])
-		]);
+		);
 
 		$response = $shuttle->post("http://example.com", new BufferBody("foo"));
 
@@ -72,13 +62,13 @@ class ShuttleTest extends TestCase
 		$this->assertEquals("text/plain", $response->getHeaderLine("Content-Type"));
 	}
 
-	public function test_patch_response_received()
+	public function test_patch_response_received(): void
 	{
-		$shuttle = new Shuttle([
-			'handler' => new MockHandler([
+		$shuttle = new Shuttle(
+			handler: new MockHandler([
 				new Response(200, new BufferStream("OK"), ["Content-Type" => "text/plain"]),
 			])
-		]);
+		);
 
 		$response = $shuttle->patch("http://example.com", new BufferBody("foo"));
 
@@ -88,13 +78,13 @@ class ShuttleTest extends TestCase
 		$this->assertEquals("text/plain", $response->getHeaderLine("Content-Type"));
 	}
 
-	public function test_put_response_received()
+	public function test_put_response_received(): void
 	{
-		$shuttle = new Shuttle([
-			'handler' => new MockHandler([
+		$shuttle = new Shuttle(
+			handler: new MockHandler([
 				new Response(200, new BufferStream("OK"), ["Content-Type" => "text/plain"]),
 			])
-		]);
+		);
 
 		$response = $shuttle->put("http://example.com", new BufferBody("foo"));
 
@@ -104,13 +94,13 @@ class ShuttleTest extends TestCase
 		$this->assertEquals("text/plain", $response->getHeaderLine("Content-Type"));
 	}
 
-	public function test_delete_response_received()
+	public function test_delete_response_received(): void
 	{
-		$shuttle = new Shuttle([
-			'handler' => new MockHandler([
+		$shuttle = new Shuttle(
+			handler: new MockHandler([
 				new Response(204, new BufferStream(), ["Content-Type" => "text/plain"]),
 			])
-		]);
+		);
 
 		$response = $shuttle->delete("http://example.com");
 
@@ -118,13 +108,13 @@ class ShuttleTest extends TestCase
 		$this->assertEquals("", $response->getBody()->getContents());
 	}
 
-	public function test_head_response_received()
+	public function test_head_response_received(): void
 	{
-		$shuttle = new Shuttle([
-			'handler' => new MockHandler([
+		$shuttle = new Shuttle(
+			handler: new MockHandler([
 				new Response(200, new BufferStream("")),
 			])
-		]);
+		);
 
 		$response = $shuttle->head("http://example.com");
 
@@ -132,13 +122,13 @@ class ShuttleTest extends TestCase
 		$this->assertEquals("", $response->getBody()->getContents());
 	}
 
-	public function test_options_response_received()
+	public function test_options_response_received(): void
 	{
-		$shuttle = new Shuttle([
-			'handler' => new MockHandler([
+		$shuttle = new Shuttle(
+			handler: new MockHandler([
 				new Response(200, new BufferStream("")),
 			])
-		]);
+		);
 
 		$response = $shuttle->options("http://example.com");
 
@@ -146,65 +136,47 @@ class ShuttleTest extends TestCase
 		$this->assertEquals("", $response->getBody()->getContents());
 	}
 
-	public function test_send_request_with_default_headers()
+	public function test_send_request_with_default_headers(): void
 	{
-		$shuttle = new Shuttle([
-			'handler' => new MockHandler([
-
+		$shuttle = new Shuttle(
+			handler: new MockHandler([
 				function(Request $request): Response {
-					return new Response(200, new BufferStream("Ok"), ['X-Default-Header' => $request->getHeader('X-Default-Header')[0]]);
+					return new Response(200, new BufferStream("Ok"), ["X-Default-Header" => $request->getHeaderLine("X-Default-Header")]);
 				},
-
 			]),
 
-			'headers' => [
-				'X-Default-Header' => 'Capsule!',
+			headers: [
+				"X-Default-Header" => "Capsule!",
 			]
-		]);
+		);
 
-		$response = $shuttle->get('http://example.com');
+		$response = $shuttle->get("http://example.com");
 
-		$this->assertTrue($response->hasHeader('X-Default-Header'));
-		$this->assertEquals('Capsule!', $response->getHeader('X-Default-Header')[0]);
+		$this->assertTrue($response->hasHeader("X-Default-Header"));
+		$this->assertEquals("Capsule!", $response->getHeaderLine("X-Default-Header"));
 	}
 
-	public function test_send_request_with_added_headers()
+	public function test_send_request_with_added_headers(): void
 	{
-		$shuttle = new Shuttle([
-			'handler' => new MockHandler([
-
+		$shuttle = new Shuttle(
+			handler: new MockHandler([
 				function(Request $request): Response {
-					return new Response(200, new BufferStream("Ok"), ['X-Added-Header' => $request->getHeader('X-Added-Header')[0]]);
+					return new Response(
+						200,
+						new BufferStream("Ok"),
+						["X-Added-Header" => $request->getHeaderLine("X-Added-Header")]
+					);
 				},
-
 			])
-		]);
+		);
 
-		$response = $shuttle->get('http://example.com', [
-			'headers' => [
-				'X-Added-Header' => 'Capsule!',
+		$response = $shuttle->get("http://example.com", [
+			"headers" => [
+				"X-Added-Header" => "Capsule!",
 			]
 		]);
 
-		$this->assertTrue($response->hasHeader('X-Added-Header'));
-		$this->assertEquals('Capsule!', $response->getHeader('X-Added-Header')[0]);
-	}
-
-	public function test_setting_debug_mode()
-	{
-		$shuttle = new Shuttle([
-			'handler' => new MockHandler([
-				new Response(200, new BufferStream("Ok"))
-			]),
-			'debug' => true,
-		]);
-
-		$mockHandler = $shuttle->getHandler();
-
-		$reflection = new \ReflectionClass($mockHandler);
-		$debug = $reflection->getProperty('debug');
-		$debug->setAccessible(true);
-
-		$this->assertTrue($debug->getValue($mockHandler));
+		$this->assertTrue($response->hasHeader("X-Added-Header"));
+		$this->assertEquals("Capsule!", $response->getHeaderLine("X-Added-Header"));
 	}
 }

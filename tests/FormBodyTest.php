@@ -1,14 +1,14 @@
 <?php
 
-namespace Shuttle\Tests;
+namespace Nimbly\Shuttle\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Shuttle\Body\FormBody;
+use Nimbly\Shuttle\Body\FormBody;
 
 /**
- * @covers Shuttle\Body\FormBody
- * @covers Shuttle\Body\BufferBody
- * @covers Capsule\Stream\BufferStream
+ * @covers Nimbly\Shuttle\Body\FormBody
+ * @covers Nimbly\Shuttle\Body\BufferBody
+ * @covers Nimbly\Capsule\Stream\BufferStream
  */
 class FormBodyTest extends TestCase
 {
