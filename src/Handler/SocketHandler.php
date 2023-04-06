@@ -2,9 +2,9 @@
 
 namespace Nimbly\Shuttle\Handler;
 
-use Nimbly\Shuttle\RawResponseTrait;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Nimbly\Shuttle\RawResponseTrait;
 use Nimbly\Shuttle\RequestException;
 
 class SocketHandler implements HandlerInterface
@@ -52,6 +52,12 @@ class SocketHandler implements HandlerInterface
 		return $this->parseRawResponse($raw_response, $response);
 	}
 
+	/**
+	 * Build the raw text based HTTP request to send.
+	 *
+	 * @param RequestInterface $request
+	 * @return string
+	 */
 	private function buildHttpRequest(RequestInterface $request): string
 	{
 		$http_request = \sprintf(
