@@ -1,6 +1,6 @@
 <?php
 
-namespace Capsule\Tests;
+namespace Nimbly\Capsule\Tests;
 
 use Nimbly\Shuttle\Body\FileUploadBody;
 use Nimbly\Capsule\Stream\BufferStream;

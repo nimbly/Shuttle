@@ -8,7 +8,6 @@ use Nimbly\Shuttle\Body\JsonBody;
 /**
  * @covers Nimbly\Shuttle\Body\JsonBody
  * @covers Nimbly\Shuttle\Body\BufferBody
- * @covers Nimbly\Capsule\Stream\BufferStream
  */
 class JsonBodyTest extends TestCase
 {

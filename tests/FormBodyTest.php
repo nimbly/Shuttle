@@ -8,7 +8,6 @@ use Nimbly\Shuttle\Body\FormBody;
 /**
  * @covers Nimbly\Shuttle\Body\FormBody
  * @covers Nimbly\Shuttle\Body\BufferBody
- * @covers Nimbly\Capsule\Stream\BufferStream
  */
 class FormBodyTest extends TestCase
 {

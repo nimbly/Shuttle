@@ -7,7 +7,6 @@ use Nimbly\Shuttle\Body\BufferBody;
 
 /**
  * @covers Nimbly\Shuttle\Body\BufferBody
- * @covers Nimbly\Capsule\Stream\BufferStream
  */
 class BufferBodyTest extends TestCase
 {

@@ -5,7 +5,6 @@ namespace Nimbly\Shuttle\Body;
 use Nimbly\Capsule\Stream\BufferStream;
 use Nimbly\Shuttle\EncodingException;
 
-
 class MultipartFormBody extends BufferStream implements BodyInterface
 {
 	/**

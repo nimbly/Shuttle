@@ -8,7 +8,6 @@ use Nimbly\Shuttle\Body\XmlBody;
 /**
  * @covers Nimbly\Shuttle\Body\XmlBody
  * @covers Nimbly\Shuttle\Body\BufferBody
- * @covers Nimbly\Capsule\Stream\BufferStream
  */
 class XmlBodyTest extends TestCase
 {
