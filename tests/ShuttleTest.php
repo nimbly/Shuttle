@@ -170,11 +170,7 @@ class ShuttleTest extends TestCase
 			])
 		);
 
-		$response = $shuttle->get("http://example.com", [
-			"headers" => [
-				"X-Added-Header" => "Capsule!",
-			]
-		]);
+		$response = $shuttle->get("http://example.com", ["X-Added-Header" => "Capsule!"]);
 
 		$this->assertTrue($response->hasHeader("X-Added-Header"));
 		$this->assertEquals("Capsule!", $response->getHeaderLine("X-Added-Header"));
