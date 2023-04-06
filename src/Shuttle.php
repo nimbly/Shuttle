@@ -22,7 +22,7 @@ use Psr\Http\Message\UriInterface;
 
 class Shuttle implements ClientInterface
 {
-	const SHUTTLE_USER_AGENT = "Shuttle/2.0";
+	const SHUTTLE_USER_AGENT = "Shuttle/1.0";
 
 	protected HandlerInterface $handler;
 	protected RequestFactoryInterface $requestFactory;
@@ -186,11 +186,6 @@ class Shuttle implements ClientInterface
 	 */
 	public function sendRequest(RequestInterface $request): ResponseInterface
 	{
-		/**
-		 *
-		 * Send the request through the Middleware chain.
-		 *
-		 */
 		return \call_user_func(
 			$this->middleware,
 			$request
