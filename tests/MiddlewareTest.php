@@ -2,8 +2,8 @@
 
 namespace Shuttle\Tests;
 
-use Capsule\Request;
-use Capsule\Response;
+use Nimbly\Capsule\Request;
+use Nimbly\Capsule\Response;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Shuttle\Handler\MockHandler;

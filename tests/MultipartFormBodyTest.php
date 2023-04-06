@@ -2,7 +2,7 @@
 
 namespace Shuttle\Tests;
 
-use Capsule\Stream\BufferStream;
+use Nimbly\Capsule\Stream\BufferStream;
 use PHPUnit\Framework\TestCase;
 use Shuttle\Body\FileUploadBody;
 use Shuttle\Body\FormBody;

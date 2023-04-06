@@ -8,7 +8,6 @@ use Shuttle\Body\FormBody;
 /**
  * @covers Shuttle\Body\FormBody
  * @covers Shuttle\Body\BufferBody
- * @covers Capsule\Stream\BufferStream
  */
 class FormBodyTest extends TestCase
 {

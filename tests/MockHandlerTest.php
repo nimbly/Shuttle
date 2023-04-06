@@ -2,9 +2,9 @@
 
 namespace Shuttle\Tests;
 
-use Capsule\Request;
-use Capsule\Response;
-use Capsule\Stream\BufferStream;
+use Nimbly\Capsule\Request;
+use Nimbly\Capsule\Response;
+use Nimbly\Capsule\Stream\BufferStream;
 use PHPUnit\Framework\TestCase;
 use Shuttle\Handler\MockHandler;
 

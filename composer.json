@@ -14,14 +14,14 @@
     "authors": [
         {
             "name": "Brent Scheffler",
-            "email": "brent@nimbly.io"
+            "email": "brent@brentscheffler.com"
         }
     ],
     "require": {
 		"php": "^7.3|^8.0",
 		"ext-json": "*",
         "psr/http-client": "^1.0",
-        "nimbly/capsule": "^1.0"
+        "nimbly/capsule": "^2.0"
 	},
 	"autoload": {
         "psr-4": {

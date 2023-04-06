@@ -2,7 +2,7 @@
 
 namespace Shuttle\Body;
 
-use Capsule\Stream\ResourceStream;
+use Nimbly\Capsule\Stream\ResourceStream;
 use Psr\Http\Message\StreamInterface;
 
 /**

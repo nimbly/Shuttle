@@ -4,9 +4,9 @@ namespace Shuttle\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Shuttle\Handler\CurlHandler;
-use Capsule\Request;
-use Capsule\Response;
-use Capsule\Stream\BufferStream;
+use Nimbly\Capsule\Request;
+use Nimbly\Capsule\Response;
+use Nimbly\Capsule\Stream\BufferStream;
 
 /**
  * @covers Shuttle\Handler\CurlHandler
@@ -207,7 +207,7 @@ class CurlHandlerTest extends TestCase
 		$this->assertEquals(CURL_HTTP_VERSION_1_1, $requestOptions[CURLOPT_HTTP_VERSION]);
 		$this->assertEquals("POST", $requestOptions[CURLOPT_CUSTOMREQUEST]);
 		$this->assertEquals(8000, $requestOptions[CURLOPT_PORT]);
-		$this->assertEquals("http://example.com:8000", $requestOptions[CURLOPT_URL]);
+		$this->assertEquals("http://example.com:8000/", $requestOptions[CURLOPT_URL]);
 		$this->assertTrue(is_callable($requestOptions[CURLOPT_WRITEFUNCTION]));
 		$this->assertTrue(is_callable($requestOptions[CURLOPT_HEADERFUNCTION]));
 		$this->assertEquals("OK", $requestOptions[CURLOPT_POSTFIELDS]);

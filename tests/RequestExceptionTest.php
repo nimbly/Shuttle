@@ -3,7 +3,7 @@
 namespace Shuttle\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Capsule\Request;
+use Nimbly\Capsule\Request;
 use Shuttle\RequestException;
 use Psr\Http\Message\RequestInterface;
 

@@ -2,7 +2,7 @@
 
 namespace Shuttle;
 
-use Capsule\Request;
+use Nimbly\Capsule\Request;
 use Closure;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;

@@ -2,7 +2,7 @@
 
 namespace Shuttle\Body;
 
-use Capsule\Stream\BufferStream;
+use Nimbly\Capsule\Stream\BufferStream;
 
 /**
  * @package Shuttle\Body

@@ -2,8 +2,8 @@
 
 namespace Shuttle\Handler;
 
-use Capsule\Response;
-use Capsule\Stream\ResourceStream;
+use Nimbly\Capsule\Response;
+use Nimbly\Capsule\Stream\ResourceStream;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;

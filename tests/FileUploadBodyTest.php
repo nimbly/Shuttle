@@ -1,9 +1,9 @@
 <?php
 
-namespace Capsule\Tests;
+namespace Nimbly\Capsule\Tests;
 
 use Shuttle\Body\FileUploadBody;
-use Capsule\Stream\BufferStream;
+use Nimbly\Capsule\Stream\BufferStream;
 use PHPUnit\Framework\TestCase;
 
 /**

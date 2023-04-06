@@ -2,8 +2,8 @@
 
 namespace Shuttle\Handler;
 
-use Capsule\Response;
-use Capsule\ResponseStatus;
+use Nimbly\Capsule\Response;
+use Nimbly\Capsule\ResponseStatus;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
