@@ -1,5 +1,6 @@
 vendor/
 build/
 .phpunit.cache/
+coverage/
 composer.lock
 .phpunit.result.cache

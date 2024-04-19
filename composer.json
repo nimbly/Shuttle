@@ -42,6 +42,9 @@
             "Nimbly\\Shuttle\\Tests\\": "tests/"
         }
     },
+    "scripts": {
+        "test": "phpunit --coverage-html=coverage"
+    },
     "suggest": {
         "ext-curl": "Use cURL library to make HTTP calls."
     }
