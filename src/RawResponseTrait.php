@@ -6,6 +6,13 @@ use Psr\Http\Message\ResponseInterface;
 
 trait RawResponseTrait
 {
+	/**
+	 * Process and parse a raw string HTTP response.
+	 *
+	 * @param string $raw_response
+	 * @param ResponseInterface $response
+	 * @return ResponseInterface
+	 */
 	protected function parseRawResponse(string $raw_response, ResponseInterface $response): ResponseInterface
 	{
 		$lines = \explode("\n", $raw_response);

@@ -2,6 +2,7 @@
 
 namespace Nimbly\Shuttle\Body;
 
+use JsonSerializable;
 use Nimbly\Shuttle\EncodingException;
 
 /**
@@ -12,26 +13,18 @@ use Nimbly\Shuttle\EncodingException;
 class JsonBody extends BufferBody
 {
 	/**
-	 * @inheritDoc
+	 * @param JsonSerializable|array $data
+	 * @param string $content_type Defaults to "application/json"
 	 */
-	protected string $content_type = "application/json";
-
-	/**
-	 * @param array $data
-	 * @param string|null $content_type
-	 */
-	public function __construct(array $data, ?string $content_type = null)
+	public function __construct(JsonSerializable|array $data, string $content_type = "application/json")
 	{
-		$json = \json_encode($data, JSON_UNESCAPED_SLASHES);
+		$buffer = \json_encode($data, JSON_UNESCAPED_SLASHES);
 
-		if( $json === false ){
+		if( $buffer === false ){
 			throw new EncodingException("Failed to encode body as JSON.");
 		}
 
-		$this->buffer = $json;
-
-		if( $content_type ){
-			$this->content_type = $content_type;
-		}
+		$this->buffer = $buffer;
+		$this->content_type = $content_type;
 	}
 }

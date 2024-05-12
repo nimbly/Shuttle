@@ -25,7 +25,7 @@ class MultipartFormBody extends BufferStream implements BodyInterface
 	public function __construct(array $parts)
 	{
 		// Create a random boundary name for each multipart request.
-		$this->boundary = \uniqid("Capsule") . "Z";
+		$this->boundary = \uniqid("Shuttle") . "Z";
 
 		/**
 		 * @var string $name

@@ -22,63 +22,33 @@ use Psr\Http\Message\UriInterface;
 
 class Shuttle implements ClientInterface
 {
-	const SHUTTLE_USER_AGENT = "Shuttle/1.0";
+	const SHUTTLE_USER_AGENT = "Shuttle/2.0";
 
-	protected HandlerInterface $handler;
-	protected RequestFactoryInterface $requestFactory;
-	protected ResponseFactoryInterface $responseFactory;
-	protected StreamFactoryInterface $streamFactory;
-	protected UriFactoryInterface $uriFactory;
 	protected Closure $middleware;
 
 	/**
-	 * @param HandlerInterface|null $handler
+	 * @param HandlerInterface $handler
 	 * @param string|null $base_url
 	 * @param array<string,string> $headers
 	 * @param array<MiddlewareInterface> $middleware
 	 * @param string $http_version
-	 * @param RequestFactoryInterface|null $requestFactory
-	 * @param ResponseFactoryInterface|null $responseFactory
-	 * @param StreamFactoryInterface|null $streamFactory
-	 * @param UriFactoryInterface|null $uriFactory
+	 * @param RequestFactoryInterface $requestFactory
+	 * @param ResponseFactoryInterface $responseFactory
+	 * @param StreamFactoryInterface $streamFactory
+	 * @param UriFactoryInterface $uriFactory
 	 */
 	public function __construct(
-		?HandlerInterface $handler = null,
+		protected HandlerInterface $handler = new CurlHandler,
 		protected ?string $base_url = null,
 		protected array $headers = [],
 		array $middleware = [],
 		protected string $http_version = "1.1",
-		?RequestFactoryInterface $requestFactory = null,
-		?ResponseFactoryInterface $responseFactory = null,
-		?StreamFactoryInterface $streamFactory = null,
-		?UriFactoryInterface $uriFactory = null,
+		protected RequestFactoryInterface $requestFactory = new RequestFactory,
+		protected ResponseFactoryInterface $responseFactory = new ResponseFactory,
+		protected StreamFactoryInterface $streamFactory = new StreamFactory,
+		protected UriFactoryInterface $uriFactory = new UriFactory,
 	)
 	{
-		if( empty($handler) ){
-			$handler = new CurlHandler;
-		}
-
-		if( empty($requestFactory) ){
-			$requestFactory = new RequestFactory;
-		}
-
-		if( empty($responseFactory) ){
-			$responseFactory = new ResponseFactory;
-		}
-
-		if( empty($streamFactory) ){
-			$streamFactory = new StreamFactory;
-		}
-
-		if( empty($uriFactory) ){
-			$uriFactory = new UriFactory;
-		}
-
-		$this->handler = $handler;
-		$this->requestFactory = $requestFactory;
-		$this->responseFactory = $responseFactory;
-		$this->uriFactory = $uriFactory;
-		$this->streamFactory = $streamFactory;
 		$this->middleware = $this->compileMiddleware(
 			$middleware,
 			function(RequestInterface $request): ResponseInterface {
