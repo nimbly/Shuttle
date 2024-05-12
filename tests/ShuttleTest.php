@@ -21,7 +21,10 @@ class ShuttleTest extends TestCase
 {
 	public function test_default_user_agent_prefix(): void
 	{
-		$this->assertEquals("Shuttle/1.0", Shuttle::SHUTTLE_USER_AGENT);
+		$this->assertEquals(
+			"Shuttle/2.0",
+			Shuttle::SHUTTLE_USER_AGENT
+		);
 	}
 
 	public function test_shuttle_creates_default_handler(): void

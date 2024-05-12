@@ -13,7 +13,7 @@ class StreamContextHandler implements HandlerInterface
 	use RawResponseTrait;
 
 	/**
-	 * Default stream handler options.
+	 * Default stream handler HTTP options.
 	 *
 	 * @var array{follow_location:int,ignore_errors:bool,request_fulluri:bool,max_redirects:int,timeout:int}
 	 */
@@ -26,15 +26,24 @@ class StreamContextHandler implements HandlerInterface
 	];
 
 	/**
+	 * Default stream handler SSL options.
+	 *
+	 * @var array
+	 */
+	protected array $ssl_options = [];
+
+	/**
 	 * @param array<string,mixed> $options Array of HTTP stream context key => value pairs. See http://php.net/manual/en/context.http.php for list of available options.
 	 */
 	public function __construct(
-		array $options = [])
+		array $options = [],
+		array $ssl_options = [])
 	{
 		/**
 		 * @psalm-suppress PropertyTypeCoercion
 		 */
 		$this->options = \array_merge($this->options, $options);
+		$this->ssl_options = \array_merge($this->ssl_options, $ssl_options);
 	}
 
 	/**
@@ -53,6 +62,12 @@ class StreamContextHandler implements HandlerInterface
 						"content" => $request->getBody()->getContents(),
 					],
 					$this->options
+				),
+				"ssl" => \array_merge(
+					$this->ssl_options,
+					[
+						"peer_name" => $request->getUri()->getHost()
+					]
 				)
 			]
 		);
