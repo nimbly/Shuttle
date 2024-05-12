@@ -32,10 +32,10 @@
         }
     },
     "require-dev": {
-        "vimeo/psalm": "^4.0",
+        "vimeo/psalm": "^5.0",
         "phpunit/phpunit": "^9.0",
         "php-coveralls/php-coveralls": "^2.1",
-        "symfony/var-dumper": "^4.2"
+        "symfony/var-dumper": "^5.0"
 	},
 	"autoload-dev": {
         "psr-4": {

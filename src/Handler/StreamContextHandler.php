@@ -28,19 +28,20 @@ class StreamContextHandler implements HandlerInterface
 	/**
 	 * Default stream handler SSL options.
 	 *
-	 * @var array
+	 * @var array<string,mixed>
 	 */
 	protected array $ssl_options = [];
 
 	/**
 	 * @param array<string,mixed> $options Array of HTTP stream context key => value pairs. See http://php.net/manual/en/context.http.php for list of available options.
+	 * @param array<string,mixed> $ssl_options Array of stream SSL options as key => value pairs. See https://www.php.net/manual/en/context.ssl.php for list of available options.
 	 */
 	public function __construct(
 		array $options = [],
 		array $ssl_options = [])
 	{
 		/**
-		 * @psalm-suppress PropertyTypeCoercion
+		 * @psalm-suppress InvalidPropertyAssignmentValue
 		 */
 		$this->options = \array_merge($this->options, $options);
 		$this->ssl_options = \array_merge($this->ssl_options, $ssl_options);
@@ -79,7 +80,7 @@ class StreamContextHandler implements HandlerInterface
 			throw new RequestException(
 				$request,
 				$error["message"] ?? "Failed to open stream",
-				$error["code"] ?? -1
+				$error["type"] ?? -1
 			);
 		}
 
