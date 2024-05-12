@@ -46,7 +46,7 @@ class CurlHandler implements HandlerInterface
 		}
 
 		$this->curlHandle = $handle;
-		$this->options += $curl_options;
+		$this->options = $curl_options + $this->options;
 	}
 
 	/**
