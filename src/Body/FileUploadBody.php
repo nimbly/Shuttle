@@ -41,7 +41,7 @@ class FileUploadBody extends BufferBody
 	 * @param string|null $content_type File mime content type.
 	 * @throws \Exception
 	 */
-	public function __construct(StreamInterface|string $file, ?string $file_name = null, string $content_type = null)
+	public function __construct(StreamInterface|string $file, ?string $file_name = null, ?string $content_type = null)
 	{
 		if( \is_string($file)){
 			$fh = \fopen($file, "r");
