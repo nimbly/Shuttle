@@ -13,26 +13,16 @@ use Nimbly\Capsule\Stream\BufferStream;
  */
 class BufferBody extends BufferStream implements BodyInterface, PartInterface
 {
-	/**
-	 * Content-Type header data.
-	 *
-	 * E.g. application/json
-	 */
-	protected string $content_type = "text/plain";
+	protected string $content_type;
 
 	/**
-	 * BufferBody constructor.
-	 *
 	 * @param string $data
-	 * @param string|null $content_type
+	 * @param string $content_type
 	 */
-	public function __construct(string $data, ?string $content_type = null)
+	public function __construct(string $data, string $content_type = "text/plain")
 	{
 		$this->buffer = $data;
-
-		if( $content_type ){
-			$this->content_type = $content_type;
-		}
+		$this->content_type = $content_type;
 	}
 
 	/**

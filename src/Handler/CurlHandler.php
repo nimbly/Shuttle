@@ -170,13 +170,12 @@ class CurlHandler implements HandlerInterface
 	 */
 	private function buildRequestHeaders(RequestInterface $request): array
 	{
-		$headers = [];
-
-		// Process the request specific headers.
-		foreach( $request->getHeaders() as $name => $values ){
-			$headers[] = $name . ":" . \implode(",", $values);
-		}
-
-		return $headers;
+		return \array_map(
+			function(string $name, array $values): string {
+				return $name . ":" . \implode(",", $values);
+			},
+			\array_keys($request->getHeaders()),
+			$request->getHeaders()
+		);
 	}
 }

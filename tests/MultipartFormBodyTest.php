@@ -13,6 +13,7 @@ use Nimbly\Shuttle\Body\MultipartFormBody;
  * @covers Nimbly\Shuttle\Body\MultipartFormBody
  * @covers Nimbly\Shuttle\Body\FormBody
  * @covers Nimbly\Shuttle\Body\FileUploadBody
+ * @covers Nimbly\Shuttle\Body\BufferBody
  */
 class MultipartFormBodyTest extends TestCase
 {

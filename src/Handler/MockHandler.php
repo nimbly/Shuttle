@@ -9,12 +9,7 @@ use Psr\Http\Message\ResponseInterface;
 class MockHandler implements HandlerInterface
 {
 	/**
-	 * MockHandler constructor.
-	 *
-	 * Pass in an array of Response instances that will be returned. You may also
-	 * pass in a closure that takes a RequestInterface and must return a ResponseInterface.
-	 *
-	 * @param array<ResponseInterface|callable> $responses
+	 * @param array<ResponseInterface|callable> $responses An array of ResponseInterface instances to be returned with each call. Alternatively, you can pass in a callable that must return a ResponseInterface instance. The RequestInterface instance will be passed into the callable.
 	 */
 	public function __construct(protected array $responses = [])
 	{

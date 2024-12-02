@@ -10,7 +10,7 @@ class MultipartFormBody extends BufferStream implements BodyInterface
 	/**
 	 * Multi-part content type, without boundary.
 	 */
-	protected string $content_type = "multipart/form-data";
+	protected string $content_type;
 
 	/**
 	 * Boundary string.
@@ -21,8 +21,9 @@ class MultipartFormBody extends BufferStream implements BodyInterface
 
 	/**
 	 * @param array<string,PartInterface> $parts
+	 * @param string $content_type
 	 */
-	public function __construct(array $parts)
+	public function __construct(array $parts, string $content_type = "multipart/form-data")
 	{
 		// Create a random boundary name for each multipart request.
 		$this->boundary = \uniqid("Shuttle") . "Z";
@@ -44,6 +45,8 @@ class MultipartFormBody extends BufferStream implements BodyInterface
 		}
 
 		$this->write("\r\n--{$this->boundary}--\r\n");
+
+		$this->content_type = $content_type;
 	}
 
 	/**

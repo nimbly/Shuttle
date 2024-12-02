@@ -3,15 +3,12 @@
 namespace Nimbly\Shuttle\Handler;
 
 use Nimbly\Shuttle\HandlerException;
-use Nimbly\Shuttle\RawResponseTrait;
 use Nimbly\Shuttle\RequestException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 class StreamContextHandler implements HandlerInterface
 {
-	use RawResponseTrait;
-
 	/**
 	 * Default stream handler HTTP options.
 	 *
@@ -140,5 +137,46 @@ class StreamContextHandler implements HandlerInterface
 		}
 
 		return $this->parseRawResponse($raw_response, $response);
+	}
+
+	/**
+	 * Process and parse a raw string HTTP response.
+	 *
+	 * @param string $raw_response
+	 * @param ResponseInterface $response
+	 * @return ResponseInterface
+	 */
+	private function parseRawResponse(string $raw_response, ResponseInterface $response): ResponseInterface
+	{
+		$lines = \explode("\n", $raw_response);
+
+		$part = "headers";
+
+		foreach( $lines as $line ){
+			if( \trim($line) === "" ){
+				$part = "body";
+				continue;
+			}
+
+			if( $part === "headers" ){
+				if( \preg_match("/^HTTP\/([\d\.]+) ([\d]{3})(?: ([\w\h]+))?\R?+$/i", \trim($line), $httpResponse) ){
+					$response = $response->withStatus((int) $httpResponse[2], $httpResponse[3] ?? "");
+					$response = $response->withProtocolVersion($httpResponse[1]);
+				}
+
+				elseif( \preg_match("/^([\w\-]+)\: (\N+)\R?+$/", \trim($line), $httpHeader) ){
+					$response = $response->withAddedHeader($httpHeader[1], $httpHeader[2]);
+				}
+			}
+			else {
+				$response->getBody()->write($line);
+			}
+		}
+
+		if( $response->getBody()->isSeekable() ){
+			$response->getBody()->rewind();
+		}
+
+		return $response;
 	}
 }

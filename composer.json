@@ -20,8 +20,8 @@
     "require": {
 		"php": "^8.2",
 		"ext-json": "*",
-        "psr/http-client": "^1.0",
-        "nimbly/capsule": "^2.0"
+        "nimbly/capsule": "^3.0",
+        "psr/http-client": "^1.0"
 	},
 	"provide": {
 		"psr/http-client-implementation": "^1.0"
@@ -35,7 +35,8 @@
         "vimeo/psalm": "^5.0",
         "phpunit/phpunit": "^9.0",
         "php-coveralls/php-coveralls": "^2.1",
-        "symfony/var-dumper": "^5.0"
+        "symfony/var-dumper": "^5.0",
+        "guzzlehttp/psr7": "^2.7"
 	},
 	"autoload-dev": {
         "psr-4": {
