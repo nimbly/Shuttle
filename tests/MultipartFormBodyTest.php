@@ -26,7 +26,7 @@ class MultipartFormBodyTest extends TestCase
 			]),
 
 			"file" => new FileUploadBody(
-				new BufferStream("Capsule!"),
+				new BufferStream("Shuttle!"),
 				"plain.txt",
 				"text/plain"
 			)
@@ -35,7 +35,7 @@ class MultipartFormBodyTest extends TestCase
 		$boundary = "--" . $multiPartFormBody->getBoundary();
 
 		$this->assertEquals(
-			"\r\n{$boundary}\r\nContent-Disposition: form-data; name=\"email\"\r\n\r\nuser@example.com\r\n{$boundary}\r\nContent-Disposition: form-data; name=\"name\"\r\n\r\nExample User\r\n{$boundary}\r\nContent-Disposition: form-data; name=\"file\"; filename=\"plain.txt\"\r\nContent-Type: text/plain\r\nContent-Length: 8\r\n\r\nCapsule!\r\n{$boundary}--\r\n",
+			"\r\n{$boundary}\r\nContent-Disposition: form-data; name=\"email\"\r\n\r\nuser@example.com\r\n{$boundary}\r\nContent-Disposition: form-data; name=\"name\"\r\n\r\nExample User\r\n{$boundary}\r\nContent-Disposition: form-data; name=\"file\"; filename=\"plain.txt\"\r\nContent-Type: text/plain\r\nContent-Length: 8\r\n\r\nShuttle!\r\n{$boundary}--\r\n",
 			$multiPartFormBody->getContents()
 		);
 	}
@@ -51,7 +51,7 @@ class MultipartFormBodyTest extends TestCase
 			]),
 
 			new FileUploadBody(
-				new BufferStream("Capsule!"),
+				new BufferStream("Shuttle!"),
 				"plain.txt",
 				"text/plain"
 			)

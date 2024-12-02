@@ -7,6 +7,9 @@ use Nimbly\Shuttle\RequestException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
+/**
+ * A PHP Stream Context handler. This handler requires remote URL access to `fopen`, so make sure that `allow_url_fopen` configuration is enabled. Typically you would only use this handler if you cannot use the `CurlHandler`.
+ */
 class StreamContextHandler implements HandlerInterface
 {
 	/**
@@ -102,15 +105,13 @@ class StreamContextHandler implements HandlerInterface
 	 */
 	private function buildRequestHeaders(array $request_headers): array
 	{
-		$headers = [];
-
-		foreach( $request_headers as $key => $values ){
-			foreach( $values as $value ){
-				$headers[] = "{$key}: {$value}";
-			}
-		}
-
-		return $headers;
+		return \array_map(
+			function(string $name, array $values): string {
+				return $name . ": " . \implode(",", $values);
+			},
+			\array_keys($request_headers),
+			$request_headers
+		);
 	}
 
 	/**

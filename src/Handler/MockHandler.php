@@ -6,6 +6,9 @@ use Nimbly\Shuttle\HandlerException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
+/**
+ * A mock HTTP handler to be used in unit and integration tests.
+ */
 class MockHandler implements HandlerInterface
 {
 	/**
