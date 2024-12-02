@@ -8,6 +8,9 @@ use Psr\Http\Message\ResponseInterface;
 use Nimbly\Shuttle\HandlerException;
 use Nimbly\Shuttle\RequestException;
 
+/**
+ * A cURL HTTP handler. This handler requires the PHP `ext-curl` extension. If no handler is specified when instantiating `Shuttle`, this handler will be used by default.
+ */
 class CurlHandler implements HandlerInterface
 {
 	private CurlHandle $curlHandle;
@@ -170,13 +173,12 @@ class CurlHandler implements HandlerInterface
 	 */
 	private function buildRequestHeaders(RequestInterface $request): array
 	{
-		$headers = [];
-
-		// Process the request specific headers.
-		foreach( $request->getHeaders() as $name => $values ){
-			$headers[] = $name . ":" . \implode(",", $values);
-		}
-
-		return $headers;
+		return \array_map(
+			function(string $name, array $values): string {
+				return $name . ": " . \implode(",", $values);
+			},
+			\array_keys($request->getHeaders()),
+			$request->getHeaders()
+		);
 	}
 }

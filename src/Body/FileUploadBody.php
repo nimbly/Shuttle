@@ -7,10 +7,7 @@ use Nimbly\Shuttle\FileException;
 use Psr\Http\Message\StreamInterface;
 
 /**
- * @package Shuttle\Body
- *
  * Useable only within in a MultpartFormBody.
- *
  */
 class FileUploadBody extends BufferBody
 {
@@ -29,19 +26,12 @@ class FileUploadBody extends BufferBody
 	protected string $file_name;
 
 	/**
-	 * The file's content type.
-	 *
-	 * @var string
-	 */
-	protected string $content_type;
-
-	/**
 	 * @param StreamInterface|string $file StreamInterface instance of file or a string that is the full path of file to open for reading.
 	 * @param string|null $file_name Filename to assign to content.
-	 * @param string|null $content_type File mime content type.
-	 * @throws \Exception
+	 * @param string $content_type File mime content type.
+	 * @throws FileException
 	 */
-	public function __construct(StreamInterface|string $file, ?string $file_name = null, ?string $content_type = null)
+	public function __construct(StreamInterface|string $file, ?string $file_name = null, string $content_type = "text/plain")
 	{
 		if( \is_string($file)){
 			$fh = \fopen($file, "r");
@@ -58,7 +48,7 @@ class FileUploadBody extends BufferBody
 		 * @psalm-suppress PossiblyInvalidArgument
 		 */
 		$this->file_name = $file_name ?? \basename($file->getMetadata("uri") ?? "file");
-		$this->content_type = $content_type ?? "text/plain";
+		$this->content_type = $content_type;
 	}
 
 	/**

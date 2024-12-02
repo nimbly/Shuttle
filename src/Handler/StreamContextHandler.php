@@ -3,17 +3,17 @@
 namespace Nimbly\Shuttle\Handler;
 
 use Nimbly\Shuttle\HandlerException;
-use Nimbly\Shuttle\RawResponseTrait;
 use Nimbly\Shuttle\RequestException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
+/**
+ * A PHP Stream Context handler. This handler requires remote URL access to `fopen`, so make sure that `allow_url_fopen` configuration is enabled. Typically you would only use this handler if you cannot use the `CurlHandler`.
+ */
 class StreamContextHandler implements HandlerInterface
 {
-	use RawResponseTrait;
-
 	/**
-	 * Default stream handler options.
+	 * Default stream handler HTTP options.
 	 *
 	 * @var array{follow_location:int,ignore_errors:bool,request_fulluri:bool,max_redirects:int,timeout:int}
 	 */
@@ -26,15 +26,25 @@ class StreamContextHandler implements HandlerInterface
 	];
 
 	/**
+	 * Default stream handler SSL options.
+	 *
+	 * @var array<string,mixed>
+	 */
+	protected array $ssl_options = [];
+
+	/**
 	 * @param array<string,mixed> $options Array of HTTP stream context key => value pairs. See http://php.net/manual/en/context.http.php for list of available options.
+	 * @param array<string,mixed> $ssl_options Array of stream SSL options as key => value pairs. See https://www.php.net/manual/en/context.ssl.php for list of available options.
 	 */
 	public function __construct(
-		array $options = [])
+		array $options = [],
+		array $ssl_options = [])
 	{
 		/**
-		 * @psalm-suppress PropertyTypeCoercion
+		 * @psalm-suppress InvalidPropertyAssignmentValue
 		 */
 		$this->options = \array_merge($this->options, $options);
+		$this->ssl_options = \array_merge($this->ssl_options, $ssl_options);
 	}
 
 	/**
@@ -53,6 +63,12 @@ class StreamContextHandler implements HandlerInterface
 						"content" => $request->getBody()->getContents(),
 					],
 					$this->options
+				),
+				"ssl" => \array_merge(
+					$this->ssl_options,
+					[
+						"peer_name" => $request->getUri()->getHost()
+					]
 				)
 			]
 		);
@@ -64,7 +80,7 @@ class StreamContextHandler implements HandlerInterface
 			throw new RequestException(
 				$request,
 				$error["message"] ?? "Failed to open stream",
-				$error["code"] ?? -1
+				$error["type"] ?? -1
 			);
 		}
 
@@ -89,15 +105,13 @@ class StreamContextHandler implements HandlerInterface
 	 */
 	private function buildRequestHeaders(array $request_headers): array
 	{
-		$headers = [];
-
-		foreach( $request_headers as $key => $values ){
-			foreach( $values as $value ){
-				$headers[] = "{$key}: {$value}";
-			}
-		}
-
-		return $headers;
+		return \array_map(
+			function(string $name, array $values): string {
+				return $name . ": " . \implode(",", $values);
+			},
+			\array_keys($request_headers),
+			$request_headers
+		);
 	}
 
 	/**
@@ -124,5 +138,46 @@ class StreamContextHandler implements HandlerInterface
 		}
 
 		return $this->parseRawResponse($raw_response, $response);
+	}
+
+	/**
+	 * Process and parse a raw string HTTP response.
+	 *
+	 * @param string $raw_response
+	 * @param ResponseInterface $response
+	 * @return ResponseInterface
+	 */
+	private function parseRawResponse(string $raw_response, ResponseInterface $response): ResponseInterface
+	{
+		$lines = \explode("\n", $raw_response);
+
+		$part = "headers";
+
+		foreach( $lines as $line ){
+			if( \trim($line) === "" ){
+				$part = "body";
+				continue;
+			}
+
+			if( $part === "headers" ){
+				if( \preg_match("/^HTTP\/([\d\.]+) ([\d]{3})(?: ([\w\h]+))?\R?+$/i", \trim($line), $httpResponse) ){
+					$response = $response->withStatus((int) $httpResponse[2], $httpResponse[3] ?? "");
+					$response = $response->withProtocolVersion($httpResponse[1]);
+				}
+
+				elseif( \preg_match("/^([\w\-]+)\: (\N+)\R?+$/", \trim($line), $httpHeader) ){
+					$response = $response->withAddedHeader($httpHeader[1], $httpHeader[2]);
+				}
+			}
+			else {
+				$response->getBody()->write($line);
+			}
+		}
+
+		if( $response->getBody()->isSeekable() ){
+			$response->getBody()->rewind();
+		}
+
+		return $response;
 	}
 }

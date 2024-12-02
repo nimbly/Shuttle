@@ -13,23 +13,15 @@ namespace Nimbly\Shuttle\Body;
 class FormBody extends BufferBody
 {
 	/**
-	 * @inheritDoc
+	 * @param array<string,mixed> $data
+	 * @param string $content_type
 	 */
-	protected string $content_type = "application/x-www-form-urlencoded";
-
-	/**
-	 * FormBody constructor.
-	 *
-	 * @param array $data
-	 * @param string|null $content_type
-	 */
-	public function __construct(array $data, ?string $content_type = null)
+	public function __construct(array $data, string $content_type = "application/x-www-form-urlencoded")
 	{
-		$this->buffer = \http_build_query($data, "n", "&", PHP_QUERY_RFC1738);
-
-		if( $content_type ){
-			$this->content_type = $content_type;
-		}
+		parent::__construct(
+			\http_build_query($data, "n", "&", PHP_QUERY_RFC1738),
+			$content_type
+		);
 	}
 
 	/**

@@ -27,8 +27,8 @@ class BufferBodyTest extends TestCase
 		$bufferBody = new BufferBody("OK");
 
 		$this->assertEquals(
-			"\r\n--Capsule\r\nContent-Disposition: form-data; name=\"test\"\r\nContent-Type: text/plain\r\n\r\nOK",
-			$bufferBody->getMultiPart("Capsule", "test")
+			"\r\n--Shuttle\r\nContent-Disposition: form-data; name=\"test\"\r\nContent-Type: text/plain\r\n\r\nOK",
+			$bufferBody->getMultiPart("Shuttle", "test")
 		);
 	}
 }
