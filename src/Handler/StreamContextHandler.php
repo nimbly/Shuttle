@@ -165,7 +165,7 @@ class StreamContextHandler implements HandlerInterface
 					$response = $response->withProtocolVersion($httpResponse[1]);
 				}
 
-				elseif( \preg_match("/^([\w\-]+)\: (\N+)\R?+$/", \trim($line), $httpHeader) ){
+				elseif( \preg_match("/^([\w\d\-_]+)\: (\N+)\R?+$/", \trim($line), $httpHeader) ){
 					$response = $response->withAddedHeader($httpHeader[1], $httpHeader[2]);
 				}
 			}
