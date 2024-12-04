@@ -21,7 +21,10 @@ class ShuttleTest extends TestCase
 {
 	public function test_default_user_agent_prefix(): void
 	{
-		$this->assertEquals("Shuttle/1.0", Shuttle::SHUTTLE_USER_AGENT);
+		$this->assertEquals(
+			"Shuttle/2.0",
+			Shuttle::SHUTTLE_USER_AGENT
+		);
 	}
 
 	public function test_shuttle_creates_default_handler(): void
@@ -146,14 +149,14 @@ class ShuttleTest extends TestCase
 			]),
 
 			headers: [
-				"X-Default-Header" => "Capsule!",
+				"X-Default-Header" => "Shuttle!",
 			]
 		);
 
 		$response = $shuttle->get("http://example.com");
 
 		$this->assertTrue($response->hasHeader("X-Default-Header"));
-		$this->assertEquals("Capsule!", $response->getHeaderLine("X-Default-Header"));
+		$this->assertEquals("Shuttle!", $response->getHeaderLine("X-Default-Header"));
 	}
 
 	public function test_send_request_with_added_headers(): void
@@ -170,9 +173,9 @@ class ShuttleTest extends TestCase
 			])
 		);
 
-		$response = $shuttle->get("http://example.com", ["X-Added-Header" => "Capsule!"]);
+		$response = $shuttle->get("http://example.com", ["X-Added-Header" => "Shuttle!"]);
 
 		$this->assertTrue($response->hasHeader("X-Added-Header"));
-		$this->assertEquals("Capsule!", $response->getHeaderLine("X-Added-Header"));
+		$this->assertEquals("Shuttle!", $response->getHeaderLine("X-Added-Header"));
 	}
 }

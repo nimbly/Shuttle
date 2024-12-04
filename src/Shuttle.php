@@ -3,82 +3,58 @@
 namespace Nimbly\Shuttle;
 
 use Closure;
-use Nimbly\Capsule\Factory\RequestFactory;
-use Nimbly\Capsule\Factory\ResponseFactory;
-use Nimbly\Capsule\Factory\StreamFactory;
+use Nimbly\Capsule\HttpMethod;
+use Psr\Http\Message\UriInterface;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\StreamInterface;
 use Nimbly\Capsule\Factory\UriFactory;
 use Nimbly\Shuttle\Body\BodyInterface;
-use Nimbly\Shuttle\Handler\CurlHandler;
-use Nimbly\Shuttle\Handler\HandlerInterface;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseFactoryInterface;
+use Nimbly\Shuttle\Handler\CurlHandler;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\StreamFactoryInterface;
-use Psr\Http\Message\StreamInterface;
+use Nimbly\Capsule\Factory\StreamFactory;
 use Psr\Http\Message\UriFactoryInterface;
-use Psr\Http\Message\UriInterface;
+use Nimbly\Capsule\Factory\RequestFactory;
+use Nimbly\Capsule\Factory\ResponseFactory;
+use Nimbly\Shuttle\Handler\HandlerInterface;
+use Psr\Http\Message\StreamFactoryInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 
 class Shuttle implements ClientInterface
 {
-	const SHUTTLE_USER_AGENT = "Shuttle/1.0";
+	const SHUTTLE_USER_AGENT = "Shuttle/2.0";
 
-	protected HandlerInterface $handler;
-	protected RequestFactoryInterface $requestFactory;
-	protected ResponseFactoryInterface $responseFactory;
-	protected StreamFactoryInterface $streamFactory;
-	protected UriFactoryInterface $uriFactory;
+	/**
+	 * The compiled middleware into a closure chain.
+	 *
+	 * @var Closure
+	 */
 	protected Closure $middleware;
 
 	/**
-	 * @param HandlerInterface|null $handler
+	 * @param HandlerInterface $handler
 	 * @param string|null $base_url
 	 * @param array<string,string> $headers
 	 * @param array<MiddlewareInterface> $middleware
 	 * @param string $http_version
-	 * @param RequestFactoryInterface|null $requestFactory
-	 * @param ResponseFactoryInterface|null $responseFactory
-	 * @param StreamFactoryInterface|null $streamFactory
-	 * @param UriFactoryInterface|null $uriFactory
+	 * @param RequestFactoryInterface $requestFactory
+	 * @param ResponseFactoryInterface $responseFactory
+	 * @param StreamFactoryInterface $streamFactory
+	 * @param UriFactoryInterface $uriFactory
 	 */
 	public function __construct(
-		?HandlerInterface $handler = null,
+		protected HandlerInterface $handler = new CurlHandler,
 		protected ?string $base_url = null,
 		protected array $headers = [],
 		array $middleware = [],
 		protected string $http_version = "1.1",
-		?RequestFactoryInterface $requestFactory = null,
-		?ResponseFactoryInterface $responseFactory = null,
-		?StreamFactoryInterface $streamFactory = null,
-		?UriFactoryInterface $uriFactory = null,
+		protected RequestFactoryInterface $requestFactory = new RequestFactory,
+		protected ResponseFactoryInterface $responseFactory = new ResponseFactory,
+		protected StreamFactoryInterface $streamFactory = new StreamFactory,
+		protected UriFactoryInterface $uriFactory = new UriFactory,
 	)
 	{
-		if( empty($handler) ){
-			$handler = new CurlHandler;
-		}
-
-		if( empty($requestFactory) ){
-			$requestFactory = new RequestFactory;
-		}
-
-		if( empty($responseFactory) ){
-			$responseFactory = new ResponseFactory;
-		}
-
-		if( empty($streamFactory) ){
-			$streamFactory = new StreamFactory;
-		}
-
-		if( empty($uriFactory) ){
-			$uriFactory = new UriFactory;
-		}
-
-		$this->handler = $handler;
-		$this->requestFactory = $requestFactory;
-		$this->responseFactory = $responseFactory;
-		$this->uriFactory = $uriFactory;
-		$this->streamFactory = $streamFactory;
 		$this->middleware = $this->compileMiddleware(
 			$middleware,
 			function(RequestInterface $request): ResponseInterface {
@@ -127,22 +103,26 @@ class Shuttle implements ClientInterface
 	}
 
 	/**
-	 * Make a Request instance.
+	 * Make a RequestInterface instance using the RequestFactory.
 	 *
-	 * @param string $method
+	 * @param string|HttpMethod $method
 	 * @param string|UriInterface $uri
 	 * @param string|StreamInterface|null $body
 	 * @param array<string,string> $headers
 	 * @param string $http_version
 	 * @return RequestInterface
 	 */
-	public function makeRequest(
-		string $method,
+	protected function makeRequest(
+		string|HttpMethod $method,
 		string|UriInterface $uri,
 		string|StreamInterface|null $body = null,
 		array $headers = [],
 		string $http_version = "1.1"): RequestInterface
 	{
+		if( $method instanceof HttpMethod ){
+			$method = $method->value;
+		}
+
 		// Create a new Request
 		$request = $this->requestFactory->createRequest(
 			$method,
@@ -195,7 +175,7 @@ class Shuttle implements ClientInterface
 	/**
 	 * Make a request.
 	 *
-	 * @param string $method
+	 * @param string|HttpMethod $method
 	 * @param string|UriInterface $uri
 	 * @param string|StreamInterface|null $body
 	 * @param array<array-key,string> $headers
@@ -204,12 +184,16 @@ class Shuttle implements ClientInterface
 	 * @return ResponseInterface
 	 */
 	public function request(
-		string $method,
+		string|HttpMethod $method,
 		string|UriInterface $uri,
 		string|StreamInterface|null $body = null,
 		array $headers = [],
 		string $http_version = "1.1"): ResponseInterface
 	{
+		if( $method instanceof HttpMethod ){
+			$method = $method->value;
+		}
+
 		return $this->sendRequest(
 			$this->makeRequest(
 				$method,

@@ -136,9 +136,9 @@ class CurlHandlerTest extends TestCase
 		$this->assertTrue(\is_array($headers));
 
 		$this->assertEquals([
-			"Host:example.com",
-			"X-Foo:Bar",
-			"X-Bar:Foo",
+			"Host: example.com",
+			"X-Foo: Bar",
+			"X-Bar: Foo",
 		], $headers);
 	}
 
