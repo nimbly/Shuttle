@@ -1,13 +1,19 @@
 # Shuttle
 [![Latest Stable Version](https://img.shields.io/packagist/v/nimbly/Shuttle.svg?style=flat-square)](https://packagist.org/packages/nimbly/Shuttle)
-[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/nimbly/shuttle/php.yml?style=flat-square)](https://github.com/nimbly/Shuttle/actions/workflows/php.yml)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/nimbly/shuttle/coverage.yml?style=flat-square)](https://github.com/nimbly/Shuttle/actions/workflows/coverage.yml)
 [![Codecov branch](https://img.shields.io/codecov/c/github/nimbly/shuttle/master?style=flat-square)](https://app.codecov.io/github/nimbly/Shuttle)
 [![License](https://img.shields.io/github/license/nimbly/Shuttle.svg?style=flat-square)](https://packagist.org/packages/nimbly/Shuttle)
 
 
 A simple PSR-18 HTTP client library.
 
+## Requirements
+
+* PHP 8.2+
+* ext-curl
+
 ## Installation
+
 ```bash
 composer require nimbly/shuttle
 ```
@@ -17,6 +23,7 @@ composer require nimbly/shuttle
 * cURL (default) and Stream Context handlers supported.
 * Middleware support out of the box.
 * Easy body transformations when creating requests with JsonBody and FormBody helper classes.
+* Support for multipart form bodies.
 
 ## Not features
 * Asynchronous calls.

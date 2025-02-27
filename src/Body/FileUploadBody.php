@@ -7,7 +7,7 @@ use Nimbly\Shuttle\FileException;
 use Psr\Http\Message\StreamInterface;
 
 /**
- * Useable only within in a MultpartFormBody.
+ * Useable only within a MultpartFormBody instance.
  */
 class FileUploadBody extends BufferBody
 {
@@ -62,7 +62,11 @@ class FileUploadBody extends BufferBody
 		}
 
 		return \sprintf(
-			"\r\n--%s\r\nContent-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\nContent-Type: %s\r\nContent-Length: %s\r\n\r\n%s",
+			"\r\n--%s".
+			"\r\nContent-Disposition: form-data; name=\"%s\"; filename=\"%s\"".
+			"\r\nContent-Type: %s".
+			"\r\nContent-Length: %s".
+			"\r\n\r\n%s",
 			$boundary,
 			$name ?? "file",
 			$this->file_name,

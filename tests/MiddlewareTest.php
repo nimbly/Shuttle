@@ -2,13 +2,15 @@
 
 namespace Nimbly\Shuttle\Tests;
 
+use ReflectionClass;
 use Nimbly\Capsule\Request;
+use Nimbly\Shuttle\Shuttle;
 use Nimbly\Capsule\Response;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
+use Psr\Http\Message\RequestInterface;
 use Nimbly\Shuttle\Handler\MockHandler;
-use Nimbly\Shuttle\Shuttle;
-use Nimbly\Shuttle\Tests\src\RequestMiddleware;
+use Nimbly\Shuttle\MiddlewareInterface;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * @covers Nimbly\Shuttle\Shuttle
@@ -21,7 +23,14 @@ class MiddlewareTest extends TestCase
 		$shuttle = new Shuttle(
 			handler: new MockHandler([new Response(200, "OK")]),
 			middleware: [
-				new RequestMiddleware
+				new class implements MiddlewareInterface
+				{
+					public function process(RequestInterface $request, callable $next): ResponseInterface
+					{
+						$response = $next($request);
+						return $response->withAddedHeader("X-Middleware", "Foo");
+					}
+				}
 			]
 		);
 

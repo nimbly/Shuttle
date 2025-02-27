@@ -35,9 +35,14 @@ class FormBody extends BufferBody
 		$multiPart = "";
 
 		foreach( $formFields as $name => $value ){
-			$multiPart .= "\r\n--{$boundary}\r\n";
-			$multiPart .= "Content-Disposition: form-data; name=\"" . $name . "\"" . "\r\n\r\n";
-			$multiPart .= $value;
+			$multiPart .= \sprintf(
+				"\r\n--%s" .
+				"\r\nContent-Disposition: form-data; name=\"%s\"" .
+				"\r\n\r\n%s",
+				$boundary,
+				$name,
+				$value
+			);
 		}
 
 		return $multiPart;

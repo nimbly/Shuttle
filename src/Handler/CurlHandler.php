@@ -103,11 +103,11 @@ class CurlHandler implements HandlerInterface
 			/**
 			 * Callback when data is received.
 			 *
-			 * @param resource $handler
+			 * @param CurlHandle $handle
 			 * @param string $data
 			 * @return int
 			 */
-			CURLOPT_WRITEFUNCTION => function(CurlHandle $handler, string $data) use (&$response): int {
+			CURLOPT_WRITEFUNCTION => function(CurlHandle $handle, string $data) use (&$response): int {
 
 				return $response->getBody()->write($data);
 			},
@@ -115,11 +115,11 @@ class CurlHandler implements HandlerInterface
 			/**
 			 * Callback when headers are received.
 			 *
-			 * @param resource $handler
+			 * @param CurlHandle $handle
 			 * @param string $header
 			 * @return int
 			 */
-			CURLOPT_HEADERFUNCTION => function(CurlHandle $handler, string $header) use (&$response): int {
+			CURLOPT_HEADERFUNCTION => function(CurlHandle $handle, string $header) use (&$response): int {
 
 				if( \preg_match("/^HTTP\/([\d\.]+) ([\d]{3})(?: ([\w\h]+))?\R?+$/i", \trim($header), $httpResponse) ){
 					$response = $response->withStatus((int) $httpResponse[2], $httpResponse[3] ?? "");
@@ -153,6 +153,7 @@ class CurlHandler implements HandlerInterface
 	private function buildRequestHttpProtocolVersion(RequestInterface $request): int
 	{
 		return match($request->getProtocolVersion()) {
+			"3", "3.0" => CURL_HTTP_VERSION_3,
 			"2", "2.0" => CURL_HTTP_VERSION_2,
 			"1", "1.0" => CURL_HTTP_VERSION_1_0,
 			default => CURL_HTTP_VERSION_1_1

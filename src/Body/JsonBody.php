@@ -18,7 +18,7 @@ class JsonBody extends BufferBody
 	{
 		$buffer = \json_encode($data, JSON_UNESCAPED_SLASHES);
 
-		if( $buffer === false ){
+		if( \json_last_error() !== JSON_ERROR_NONE || $buffer === false ){
 			throw new EncodingException("Failed to encode body as JSON.");
 		}
 

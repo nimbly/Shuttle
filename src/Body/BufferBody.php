@@ -39,7 +39,10 @@ class BufferBody extends BufferStream implements BodyInterface, PartInterface
 	public function getMultiPart(string $boundary, ?string $name = null): string
 	{
 		return \sprintf(
-			"\r\n--%s\r\nContent-Disposition: form-data; name=\"%s\"\r\nContent-Type: %s\r\n\r\n%s",
+			"\r\n--%s".
+			"\r\nContent-Disposition: form-data; name=\"%s\"".
+			"\r\nContent-Type: %s".
+			"\r\n\r\n%s",
 			$boundary,
 			$name ?? "form",
 			$this->getContentType(),
