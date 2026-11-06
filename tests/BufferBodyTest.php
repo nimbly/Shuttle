@@ -3,11 +3,10 @@
 namespace Nimbly\Shuttle\Tests;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Nimbly\Shuttle\Body\BufferBody;
 
-/**
- * @covers Nimbly\Shuttle\Body\BufferBody
- */
+#[CoversClass(BufferBody::class)]
 class BufferBodyTest extends TestCase
 {
 	public function test_setting_body_in_buffer_body_constructor()

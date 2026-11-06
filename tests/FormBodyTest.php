@@ -3,12 +3,11 @@
 namespace Nimbly\Shuttle\Tests;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Nimbly\Shuttle\Body\FormBody;
+use Nimbly\Shuttle\Body\BufferBody;
 
-/**
- * @covers Nimbly\Shuttle\Body\FormBody
- * @covers Nimbly\Shuttle\Body\BufferBody
- */
+#[CoversClass(FormBody::class)]
 class FormBodyTest extends TestCase
 {
 	public function test_default_content_type()

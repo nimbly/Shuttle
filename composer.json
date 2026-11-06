@@ -33,7 +33,7 @@
     },
     "require-dev": {
         "vimeo/psalm": "^6.0",
-        "phpunit/phpunit": "^10.0",
+        "phpunit/phpunit": "^11.0",
         "symfony/var-dumper": "^5.0",
         "guzzlehttp/psr7": "^2.7"
 	},

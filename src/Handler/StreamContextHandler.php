@@ -119,6 +119,7 @@ class StreamContextHandler implements HandlerInterface
 	 *
 	 * @param resource $stream
 	 * @param ResponseInterface $response
+	 * @throws HandlerException
 	 * @return ResponseInterface
 	 */
 	private function parseResponse($stream, ResponseInterface $response): ResponseInterface

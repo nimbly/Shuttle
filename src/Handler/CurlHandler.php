@@ -32,7 +32,6 @@ class CurlHandler implements HandlerInterface
 		CURLOPT_VERBOSE => false
 	];
 
-
 	/**
 	 * CurlHandler constructor.
 	 *
@@ -57,6 +56,7 @@ class CurlHandler implements HandlerInterface
 	 *
 	 * @param RequestInterface $request
 	 * @param ResponseInterface $response
+	 * @throws RequestException
 	 * @return ResponseInterface
 	 */
 	public function execute(RequestInterface $request, ResponseInterface $response): ResponseInterface
@@ -165,8 +165,8 @@ class CurlHandler implements HandlerInterface
 	 *
 	 * Eg:
 	 * [
-	 *      "Content-Type: text/plain",
-	 *      "Authorization: Basic YnJlbnRAbmltYmx5LmlvOnBhc3N3b3JkCg=="
+	 *		"Content-Type: text/plain",
+	 *		"Authorization: Basic YnJlbnRAbmltYmx5LmlvOnBhc3N3b3JkCg=="
 	 * ]
 	 *
 	 * @param RequestInterface $request

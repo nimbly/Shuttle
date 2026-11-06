@@ -6,15 +6,10 @@ use Nimbly\Capsule\Stream\BufferStream;
 use PHPUnit\Framework\TestCase;
 use Nimbly\Shuttle\Body\FileUploadBody;
 use Nimbly\Shuttle\Body\FormBody;
-use Nimbly\Shuttle\Body\JsonBody;
 use Nimbly\Shuttle\Body\MultipartFormBody;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * @covers Nimbly\Shuttle\Body\MultipartFormBody
- * @covers Nimbly\Shuttle\Body\FormBody
- * @covers Nimbly\Shuttle\Body\FileUploadBody
- * @covers Nimbly\Shuttle\Body\BufferBody
- */
+#[CoversClass(MultipartFormBody::class)]
 class MultipartFormBodyTest extends TestCase
 {
 	public function test_multiple_parts()

@@ -13,6 +13,7 @@ class JsonBody extends BufferBody
 	/**
 	 * @param JsonSerializable|array<string,mixed>|array<mixed> $data
 	 * @param string $content_type Defaults to "application/json"
+	 * @throws EncodingException
 	 */
 	public function __construct(JsonSerializable|array $data, string $content_type = "application/json")
 	{

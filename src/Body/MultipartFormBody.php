@@ -22,6 +22,7 @@ class MultipartFormBody extends BufferStream implements BodyInterface
 	/**
 	 * @param array<string,PartInterface> $parts
 	 * @param string $content_type
+	 * @throws EncodingException
 	 */
 	public function __construct(array $parts, string $content_type = "multipart/form-data")
 	{

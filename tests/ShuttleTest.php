@@ -3,6 +3,7 @@
 namespace Nimbly\Shuttle\Tests;
 
 use Nimbly\Capsule\Request;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Nimbly\Capsule\Response;
 use Nimbly\Capsule\Stream\BufferStream;
 use PHPUnit\Framework\TestCase;
@@ -11,12 +12,7 @@ use Nimbly\Shuttle\Handler\HandlerInterface;
 use Nimbly\Shuttle\Handler\MockHandler;
 use Nimbly\Shuttle\Shuttle;
 
-/**
- * @covers Nimbly\Shuttle\Shuttle
- * @covers Nimbly\Shuttle\Handler\MockHandler
- * @covers Nimbly\Shuttle\Handler\CurlHandler
- * @covers Nimbly\Shuttle\Body\BufferBody
- */
+#[CoversClass(Shuttle::class)]
 class ShuttleTest extends TestCase
 {
 	public function test_default_user_agent_prefix(): void

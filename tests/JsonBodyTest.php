@@ -4,11 +4,9 @@ namespace Nimbly\Shuttle\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Nimbly\Shuttle\Body\JsonBody;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * @covers Nimbly\Shuttle\Body\JsonBody
- * @covers Nimbly\Shuttle\Body\BufferBody
- */
+#[CoversClass(JsonBody::class)]
 class JsonBodyTest extends TestCase
 {
 	public function test_default_content_type()

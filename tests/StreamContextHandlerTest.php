@@ -3,16 +3,13 @@
 namespace Nimbly\Shuttle\Tests;
 
 use Nimbly\Capsule\Request;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Nimbly\Capsule\Response;
 use Nimbly\Shuttle\Handler\StreamContextHandler;
-use Nimbly\Shuttle\RequestException;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
-/**
- * @covers Nimbly\Shuttle\Handler\StreamContextHandler
- * @covers Nimbly\Shuttle\RequestException
- */
+#[CoversClass(StreamContextHandler::class)]
 class StreamContextHandlerTest extends TestCase
 {
 	public function test_default_options(): void
@@ -21,7 +18,6 @@ class StreamContextHandlerTest extends TestCase
 
 		$reflectionClass = new ReflectionClass($streamContextHandler);
 		$reflectionProperty = $reflectionClass->getProperty("options");
-		$reflectionProperty->setAccessible(true);
 
 		$options = $reflectionProperty->getValue($streamContextHandler);
 
@@ -38,7 +34,6 @@ class StreamContextHandlerTest extends TestCase
 		$reflectionClass = new ReflectionClass($streamContextHandler);
 
 		$reflectionMethod = $reflectionClass->getMethod("buildRequestHeaders");
-		$reflectionMethod->setAccessible(true);
 
 		$headers = $reflectionMethod->invokeArgs($streamContextHandler, [
 			["X-Header-1" => ["Foo"], "X-Header-2" => ["Bar"]]

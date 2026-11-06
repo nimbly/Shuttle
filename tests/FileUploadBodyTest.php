@@ -5,10 +5,9 @@ namespace Nimbly\Capsule\Tests;
 use Nimbly\Shuttle\Body\FileUploadBody;
 use Nimbly\Capsule\Stream\BufferStream;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * @covers Nimbly\Shuttle\Body\FileUploadBody
- */
+#[CoversClass(FileUploadBody::class)]
 class FileUploadBodyTest extends TestCase
 {
 	public function test_create_instance_from_file_on_disk()

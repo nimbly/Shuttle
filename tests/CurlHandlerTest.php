@@ -3,24 +3,21 @@
 namespace Nimbly\Shuttle\Tests;
 
 use Nimbly\Capsule\Request;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Nimbly\Capsule\Response;
 use Nimbly\Capsule\Stream\BufferStream;
 use Nimbly\Shuttle\Handler\CurlHandler;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
-/**
- * @covers Nimbly\Shuttle\Handler\CurlHandler
- */
+#[CoversClass(CurlHandler::class)]
 class CurlHandlerTest extends TestCase
 {
 	public function test_default_options(): void
 	{
 		$curlHandler = new CurlHandler;
 		$reflectionClass = new ReflectionClass($curlHandler);
-
 		$reflectionProperty = $reflectionClass->getProperty("options");
-		$reflectionProperty->setAccessible(true);
 
 		$options = $reflectionProperty->getValue($curlHandler);
 
@@ -74,7 +71,6 @@ class CurlHandlerTest extends TestCase
 		$request = $request->withProtocolVersion("1");
 
 		$reflectionMethod = $reflectionClass->getMethod("buildRequestHttpProtocolVersion");
-		$reflectionMethod->setAccessible(true);
 		$httpVersion = $reflectionMethod->invoke($curlHandler, $request);
 
 		$this->assertEquals(
@@ -92,7 +88,6 @@ class CurlHandlerTest extends TestCase
 		$request = $request->withProtocolVersion("1.1");
 
 		$reflectionMethod = $reflectionClass->getMethod("buildRequestHttpProtocolVersion");
-		$reflectionMethod->setAccessible(true);
 		$httpVersion = $reflectionMethod->invoke($curlHandler, $request);
 
 		$this->assertEquals(
@@ -110,7 +105,6 @@ class CurlHandlerTest extends TestCase
 		$request = $request->withProtocolVersion("2");
 
 		$reflectionMethod = $reflectionClass->getMethod("buildRequestHttpProtocolVersion");
-		$reflectionMethod->setAccessible(true);
 		$httpVersion = $reflectionMethod->invoke($curlHandler, $request);
 
 		$this->assertEquals(
@@ -130,7 +124,6 @@ class CurlHandlerTest extends TestCase
 		->withHeader("X-Bar", "Foo");
 
 		$reflectionMethod = $reflectionClass->getMethod("buildRequestHeaders");
-		$reflectionMethod->setAccessible(true);
 		$headers = $reflectionMethod->invoke($curlHandler, $request);
 
 		$this->assertTrue(\is_array($headers));
@@ -151,7 +144,6 @@ class CurlHandlerTest extends TestCase
 		$response = new Response(200);
 
 		$reflectionMethod = $reflectionClass->getMethod("buildCurlRequestOptions");
-		$reflectionMethod->setAccessible(true);
 		$requestOptions = $reflectionMethod->invokeArgs($curlHandler, [$request, &$response]);
 
 		$this->assertEquals(CURL_HTTP_VERSION_1_1, $requestOptions[CURLOPT_HTTP_VERSION]);

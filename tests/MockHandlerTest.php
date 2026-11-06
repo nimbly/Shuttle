@@ -7,10 +7,9 @@ use Nimbly\Capsule\Response;
 use Nimbly\Capsule\Stream\BufferStream;
 use PHPUnit\Framework\TestCase;
 use Nimbly\Shuttle\Handler\MockHandler;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * @covers Nimbly\Shuttle\Handler\MockHandler
- */
+#[CoversClass(MockHandler::class)]
 class MockHandlerTest extends TestCase
 {
 	public function test_response_instances_in_queue()

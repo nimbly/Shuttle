@@ -3,6 +3,7 @@
 namespace Nimbly\Shuttle\Tests;
 
 use ReflectionClass;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Nimbly\Capsule\Request;
 use Nimbly\Shuttle\Shuttle;
 use Nimbly\Capsule\Response;
@@ -12,10 +13,7 @@ use Nimbly\Shuttle\Handler\MockHandler;
 use Nimbly\Shuttle\MiddlewareInterface;
 use Psr\Http\Message\ResponseInterface;
 
-/**
- * @covers Nimbly\Shuttle\Shuttle
- * @covers Nimbly\Shuttle\Handler\MockHandler
- */
+#[CoversClass(Shuttle::class)]
 class MiddlewareTest extends TestCase
 {
 	public function test_middleware_compiles()
@@ -36,7 +34,6 @@ class MiddlewareTest extends TestCase
 
 		$reflectionClass = new ReflectionClass($shuttle);
 		$reflectionProperty = $reflectionClass->getProperty("middleware");
-		$reflectionProperty->setAccessible(true);
 		$middleware = $reflectionProperty->getValue($shuttle);
 
 		$response = \call_user_func($middleware, new Request("post", "/path"));
